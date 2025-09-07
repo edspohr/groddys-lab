@@ -67,7 +67,7 @@
     <div id="login-screen" class="flex flex-col items-center justify-center min-h-screen bg-[var(--brand-dark-bg)] p-4">
         <div class="w-full max-w-sm">
             <div class="flex flex-col items-center mb-8">
-                <div class="w-12 h-12 bg-gray-700 border-2 border-[var(--brand-turquoise)] rounded-lg"></div>
+                <img src="img/logo.png" alt="Logo de Groddy's Lab" class="w-16 h-16">
                 <h1 class="text-3xl font-bold text-white mt-4">Groddy's Lab</h1>
                 <p class="text-[var(--brand-text-secondary)]">Portal de Cliente</p>
             </div>
@@ -100,7 +100,7 @@
     <div id="app-portal" class="hidden h-screen bg-[var(--brand-dark-bg)]">
         <!-- Sidebar -->
         <aside class="w-20 bg-[var(--brand-card-bg)] border-r border-[var(--brand-border)] text-[var(--brand-text-secondary)] flex flex-col items-center py-6 space-y-6 z-30">
-             <div class="flex items-center justify-center"><div class="w-8 h-8 bg-gray-700 border-2 border-[var(--brand-turquoise)] rounded-md"></div></div>
+             <img src="img/logo.png" alt="Logo de Groddy's Lab" class="w-10 h-10">
             <nav class="flex flex-col items-center space-y-4 flex-grow">
                 <button onclick="showModule('dashboard-kanban')" class="sidebar-icon active p-3 rounded-xl" data-tooltip="Dashboard"><i data-lucide="layout-dashboard"></i></button>
                 <button onclick="showModule('ai-agent')" class="sidebar-icon p-3 rounded-xl" data-tooltip="Groddy AI"><i data-lucide="brain-circuit"></i></button>
@@ -190,7 +190,7 @@
         };
 
         // --- GEMINI API SETUP ---
-        const apiKey = "AIzaSyDHs_dpJXr6au8SqSiYRNih5AEvpKOTQ5w"; 
+        const apiKey = ""; 
         const geminiApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
         async function callGeminiAPI(history) {
