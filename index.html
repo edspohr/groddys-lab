@@ -103,8 +103,7 @@
              <img src="img/logo.png" alt="Logo de Groddy's Lab" class="w-10 h-10">
             <nav class="flex flex-col items-center space-y-4 flex-grow">
                 <button onclick="showModule('dashboard-kanban')" class="sidebar-icon active p-3 rounded-xl" data-tooltip="Dashboard"><i data-lucide="layout-dashboard"></i></button>
-                <button onclick="showModule('ai-agent')" class="sidebar-icon p-3 rounded-xl" data-tooltip="Groddy AI"><i data-lucide="brain-circuit"></i></button>
-                <button onclick="showModule('files')" class="sidebar-icon p-3 rounded-xl" data-tooltip="Archivos"><i data-lucide="folder-kanban"></i></button>
+                <button onclick="showModule('ai-agent')" class="sidebar-icon p-3 rounded-xl flex items-center justify-center" data-tooltip="Groddy AI"><span class="font-bold text-base">AI</span></button>
                 <button onclick="showModule('user-info')" class="sidebar-icon p-3 rounded-xl" data-tooltip="Mi Perfil"><i data-lucide="user-circle"></i></button>
             </nav>
             <div class="flex flex-col items-center space-y-4">
@@ -121,7 +120,6 @@
         <main class="flex-1 p-6 md:p-8 overflow-y-auto">
             <header class="flex justify-between items-center mb-8">
                  <div><h1 id="module-title" class="text-3xl font-bold text-white"></h1><p id="module-description" class="text-[var(--brand-text-secondary)]"></p></div>
-                <div class="flex items-center gap-4 admin-only"><select id="client-selector" class="bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[var(--brand-turquoise)] transition text-sm"></select></div>
             </header>
 
             <!-- Módulos -->
@@ -141,8 +139,7 @@
                 </div>
                  <div class="mt-12"><h3 class="text-xl font-semibold text-white mb-4">Historial de Tareas Completadas</h3><div id="history-list" class="bg-[var(--brand-card-bg)] border border-[var(--brand-border)] rounded-lg p-4 max-h-80 overflow-y-auto space-y-3"><p class="text-center text-[var(--brand-text-secondary)]">Aún no hay tareas archivadas.</p></div></div>
             </div>
-            <div id="ai-agent" class="module"><div class="max-w-3xl mx-auto"><div class="bg-[var(--brand-card-bg)] border border-[var(--brand-border)] rounded-lg shadow-lg"><div id="chat-messages" class="p-6 h-[32rem] overflow-y-auto space-y-4"></div><div class="p-4 border-t border-[var(--brand-border)]"><form id="ai-form" class="flex items-center gap-3 editor-only"><input id="ai-input" type="text" placeholder="Describe una idea o un problema..." class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[var(--brand-turquoise)] transition text-sm"><button type="submit" class="bg-[var(--brand-turquoise)] text-[var(--brand-dark-bg)] px-4 py-2 rounded-lg font-semibold hover:opacity-90 transition">Enviar</button></form></div></div></div></div>
-            <div id="files" class="module"><div class="bg-[var(--brand-card-bg)] border border-[var(--brand-border)] rounded-lg"><table class="w-full text-sm text-left"><thead class="bg-gray-800 text-[var(--brand-text-secondary)] uppercase"><tr><th scope="col" class="px-6 py-3">Nombre del Archivo</th><th scope="col" class="px-6 py-3">Subido por</th><th scope="col" class="px-6 py-3">Fecha</th><th scope="col" class="px-6 py-3"></th></tr></thead><tbody id="files-list"></tbody></table></div></div>
+            <div id="ai-agent" class="module"><div class="max-w-3xl mx-auto"><div class="bg-[var(--brand-card-bg)] border border-[var(--brand-border)] rounded-lg shadow-lg"><div id="chat-messages" class="p-6 h-[32rem] overflow-y-auto space-y-4"></div><div class="p-4 border-t border-[var(--brand-border)]"><form id="ai-form" class="flex items-center gap-3"><input id="ai-input" type="text" placeholder="Describe una idea o un problema..." class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[var(--brand-turquoise)] transition text-sm"><button type="submit" class="bg-[var(--brand-turquoise)] text-[var(--brand-dark-bg)] px-4 py-2 rounded-lg font-semibold hover:opacity-90 transition">Enviar</button></form></div></div></div></div>
             <div id="user-info" class="module"></div>
         </main>
     </div>
@@ -151,11 +148,13 @@
     <div id="task-detail-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden items-center justify-center z-50 p-4"><div class="bg-[var(--brand-card-bg)] p-6 rounded-lg border border-[var(--brand-border)] w-full max-w-2xl max-h-[90vh] flex flex-col"><div class="flex-shrink-0"><h2 id="modal-title" class="text-xl font-bold mb-6 text-white"></h2><form id="task-form" class="space-y-4"><input type="hidden" id="task-id"><input type="hidden" id="task-column"><div><label for="task-title" class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1">Título</label><input type="text" id="task-title" class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[var(--brand-turquoise)] transition text-sm" required></div><div><label for="task-description" class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1">Descripción</label><textarea id="task-description" rows="3" class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[var(--brand-turquoise)] transition text-sm"></textarea></div><div class="grid grid-cols-2 md:grid-cols-4 gap-4"><div><label for="task-priority" class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1">Prioridad</label><select id="task-priority" class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4"><option value="low">Baja</option><option value="medium">Media</option><option value="high">Alta</option></select></div><div><label for="task-impact" class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1">Ahorro Indiv.</label><input type="number" id="task-impact" placeholder="Horas" class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4"></div><div><label for="task-users-affected" class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1">Usuarios Afect.</label><input type="number" id="task-users-affected" placeholder="Cantidad" class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4"></div><div><label for="task-type" class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1">Recurrencia</label><select id="task-type" class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4"><option value="once">Único</option><option value="recurring">Recurrente</option></select></div></div></form></div><div class="flex-grow mt-6 pt-4 border-t border-[var(--brand-border)] overflow-y-auto"><h3 class="text-lg font-semibold text-white mb-3">Comentarios</h3><div id="comments-section" class="space-y-4"></div></div><div class="flex-shrink-0 mt-6 pt-4 border-t border-[var(--brand-border)]"><form id="comment-form" class="flex items-center gap-2"><input id="comment-input" type="text" placeholder="Escribe un comentario..." class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-3 text-sm"><button type="submit" class="px-4 py-2 rounded-lg text-sm font-semibold bg-[var(--brand-turquoise)] text-black">Enviar</button></form><div class="flex justify-end gap-3 mt-4"><button type="button" onclick="closeTaskDetails()" class="px-4 py-2 rounded-lg text-sm font-semibold bg-gray-600 hover:bg-gray-500 transition">Cerrar</button><button type="button" id="save-task-btn" class="px-4 py-2 rounded-lg text-sm font-semibold bg-[var(--brand-turquoise)] text-black hover:opacity-90 transition editor-only">Guardar Cambios</button></div></div></div></div>
     <div id="user-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden items-center justify-center z-50 p-4">
         <div class="bg-[var(--brand-card-bg)] p-6 rounded-lg border border-[var(--brand-border)] w-full max-w-md">
-            <h2 id="user-modal-title" class="text-xl font-bold mb-6 text-white">Crear Nuevo Usuario</h2>
+            <h2 id="user-modal-title" class="text-xl font-bold mb-6 text-white"></h2>
             <form id="user-form" class="space-y-4">
-                <div><label for="user-name" class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1">Nombre Completo</label><input type="text" id="user-name" required class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4"></div>
+                 <input type="hidden" id="user-id">
                 <div><label for="user-email" class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1">Correo Electrónico</label><input type="email" id="user-email" required class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4"></div>
-                <div><label for="user-company" class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1">Empresa</label><input type="text" id="user-company" required class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4"></div>
+                <div><label for="user-name" class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1">Nombre Completo</label><input type="text" id="user-name" class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4"></div>
+                <div><label for="user-company" class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1">Empresa</label><input type="text" id="user-company" class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4"></div>
+                <div><label for="user-title" class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1">Cargo</label><input type="text" id="user-title" class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4"></div>
                 <div><label for="user-role" class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1">Rol</label><select id="user-role" class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4"><option value="Editor">Editor</option><option value="Visualizador">Visualizador</option><option value="Admin">Admin</option><option value="Inactivo">Inactivo</option></select></div>
                 <div class="mt-6 flex justify-end gap-3">
                     <button type="button" onclick="closeUserModal()" class="px-4 py-2 rounded-lg text-sm font-semibold bg-gray-600 hover:bg-gray-500 transition">Cancelar</button>
@@ -168,11 +167,11 @@
     <script>
     window.addEventListener('load', () => {
         // --- DOM ELEMENTS ---
-        const loginScreen = document.getElementById('login-screen'), appPortal = document.getElementById('app-portal'), loginForm = document.getElementById('login-form'), loginError = document.getElementById('login-error'), clientSelector = document.getElementById('client-selector'), moduleTitle = document.getElementById('module-title'), moduleDescription = document.getElementById('module-description'), userInfoModule = document.getElementById('user-info'), userModal = document.getElementById('user-modal'), userForm = document.getElementById('user-form'), taskDetailModal = document.getElementById('task-detail-modal'), taskForm = document.getElementById('task-form'), kanbanBoard = document.getElementById('kanban-board'), totalHoursSavedEl = document.getElementById('total-hours-saved'), archiveTasksBtn = document.getElementById('archive-tasks-btn'), historyList = document.getElementById('history-list'), notificationsPanel = document.getElementById('notifications-panel'), notificationsList = document.getElementById('notifications-list'), notificationsIndicator = document.getElementById('notifications-indicator'), filesList = document.getElementById('files-list'), commentForm = document.getElementById('comment-form'), commentInput = document.getElementById('comment-input'), commentsSection = document.getElementById('comments-section'), saveTaskBtn = document.getElementById('save-task-btn'), aiForm = document.getElementById('ai-form'), aiInput = document.getElementById('ai-input'), chatMessages = document.getElementById('chat-messages');
+        const loginScreen = document.getElementById('login-screen'), appPortal = document.getElementById('app-portal'), loginForm = document.getElementById('login-form'), loginError = document.getElementById('login-error'), clientSelector = document.getElementById('client-selector'), moduleTitle = document.getElementById('module-title'), moduleDescription = document.getElementById('module-description'), userInfoModule = document.getElementById('user-info'), userModal = document.getElementById('user-modal'), userForm = document.getElementById('user-form'), taskDetailModal = document.getElementById('task-detail-modal'), taskForm = document.getElementById('task-form'), kanbanBoard = document.getElementById('kanban-board'), totalHoursSavedEl = document.getElementById('total-hours-saved'), archiveTasksBtn = document.getElementById('archive-tasks-btn'), historyList = document.getElementById('history-list'), notificationsPanel = document.getElementById('notifications-panel'), notificationsList = document.getElementById('notifications-list'), notificationsIndicator = document.getElementById('notifications-indicator'), commentForm = document.getElementById('comment-form'), commentInput = document.getElementById('comment-input'), commentsSection = document.getElementById('comments-section'), saveTaskBtn = document.getElementById('save-task-btn'), aiForm = document.getElementById('ai-form'), aiInput = document.getElementById('ai-input'), chatMessages = document.getElementById('chat-messages');
         
         // --- APP STATE ---
         let currentUser = null, currentClientEmail = '', chatHistory = [];
-        let tasksData = {}, historyData = {}, monthlyHoursSaved = {}, notificationsData = {}, filesData = {};
+        let tasksData = {}, historyData = {}, monthlyHoursSaved = {}, notificationsData = {};
 
         // --- DATA ---
         let sampleUsers = [
@@ -185,7 +184,6 @@
         const moduleInfo = {
             'dashboard-kanban': { title: 'Dashboard & Kanban', description: 'Métricas clave y gestión del flujo de trabajo.' },
             'ai-agent': { title: 'Groddy AI', description: 'Transforma tus ideas en soluciones y tareas accionables.' },
-            'files': { title: 'Repositorio de Archivos', description: 'Documentos y entregables centralizados del proyecto.' },
             'user-info': { title: 'Mi Perfil', description: 'Información de tu cuenta y configuración.' }
         };
 
@@ -243,10 +241,6 @@
                     { text: 'Admin movió "Estrategia SEO" a In Progress.', date: 'hace 3 horas', read: false },
                     { text: 'Nueva tarea "Optimizar Checkout" fue creada.', date: 'hace 2 días', read: true }
                 ];
-                filesData[user.email] = [
-                    { name: 'brief_proyecto_v1.pdf', author: 'Cliente Principal', date: '2025-08-01'},
-                    { name: 'reporte_kpis_agosto.xlsx', author: 'Admin Groddy', date: '2025-09-01'}
-                ]
             });
         }
         
@@ -290,18 +284,17 @@
             document.getElementById('user-avatar').textContent = currentUser.avatar;
             
             if (currentUser.role === 'Admin') {
-                populateClientSelector();
-                clientSelector.value = currentClientEmail;
                 moduleInfo['user-info'].title = 'Admin Panel';
+                moduleInfo['user-info'].description = 'Gestiona usuarios y clientes de la plataforma.';
             } else {
                  moduleInfo['user-info'].title = 'Mi Perfil';
+                 moduleInfo['user-info'].description = 'Información de tu cuenta.';
             }
             
             initializeKanban();
             initializeChat();
             renderUserInfo();
             renderNotifications();
-            renderFiles();
             calculateCurrentMonthHours();
             initializeHoursChart();
             showModule('dashboard-kanban');
@@ -321,26 +314,47 @@
         };
 
         function populateClientSelector() {
-            clientSelector.innerHTML = '';
+            const selector = document.getElementById('client-selector');
+            if (!selector) return;
+            selector.innerHTML = '';
             sampleUsers.filter(u => u.role !== 'Admin' && u.role !== 'Inactivo').forEach(user => {
                 const option = document.createElement('option');
                 option.value = user.email;
                 option.textContent = user.name;
-                clientSelector.appendChild(option);
+                selector.appendChild(option);
             });
+            selector.value = currentClientEmail;
         }
-        clientSelector.addEventListener('change', (e) => { 
+
+        function handleClientChange(e) { 
             currentClientEmail = e.target.value; 
             initializeKanban(); 
             calculateCurrentMonthHours(); 
             initializeHoursChart(); 
-            renderFiles(); 
-        });
+        }
 
         // --- USER MANAGEMENT (Admin) ---
-        window.openUserModal = () => {
+        window.openUserModal = (email = null) => {
             userForm.reset();
-            document.getElementById('user-modal-title').textContent = 'Crear Nuevo Usuario';
+            const isEditing = email !== null;
+            document.getElementById('user-modal-title').textContent = isEditing ? 'Editar Usuario' : 'Crear Nuevo Usuario';
+            const emailInput = document.getElementById('user-email');
+            
+            if (isEditing) {
+                const user = sampleUsers.find(u => u.email === email);
+                if (!user) return;
+                document.getElementById('user-id').value = user.email;
+                emailInput.value = user.email;
+                emailInput.readOnly = true;
+                document.getElementById('user-name').value = user.name || '';
+                document.getElementById('user-company').value = user.company || '';
+                document.getElementById('user-title').value = user.title || '';
+                document.getElementById('user-role').value = user.role;
+            } else {
+                document.getElementById('user-id').value = '';
+                emailInput.readOnly = false;
+            }
+
             userModal.classList.remove('hidden');
             userModal.classList.add('flex');
         }
@@ -348,23 +362,35 @@
 
         userForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            const name = document.getElementById('user-name').value;
-            const email = document.getElementById('user-email').value;
-            
-            if (sampleUsers.some(u => u.email === email)) {
-                alert('El correo electrónico ya existe.');
+            const userId = document.getElementById('user-id').value;
+            const email = document.getElementById('user-email').value.trim();
+            if (!email) {
+                alert('El correo electrónico es obligatorio.');
                 return;
             }
 
-            const newUser = {
-                name,
-                email,
-                company: document.getElementById('user-company').value,
+            const formData = {
+                name: document.getElementById('user-name').value.trim(),
+                email: email,
+                company: document.getElementById('user-company').value.trim(),
+                title: document.getElementById('user-title').value.trim(),
                 role: document.getElementById('user-role').value,
-                avatar: name.split(' ').map(n => n[0]).join('').toUpperCase(),
-                title: 'Nuevo Usuario'
             };
-            sampleUsers.push(newUser);
+
+            if (userId) { // Editing
+                const userToUpdate = sampleUsers.find(u => u.email === userId);
+                if (userToUpdate) {
+                    Object.assign(userToUpdate, formData);
+                    userToUpdate.avatar = userToUpdate.name ? userToUpdate.name.split(' ').map(n => n[0]).join('').toUpperCase() : '?';
+                }
+            } else { // Creating
+                if (sampleUsers.some(u => u.email === email)) {
+                    alert('El correo electrónico ya existe.');
+                    return;
+                }
+                formData.avatar = formData.name ? formData.name.split(' ').map(n => n[0]).join('').toUpperCase() : '?';
+                sampleUsers.push(formData);
+            }
             renderUserInfo();
             closeUserModal();
         });
@@ -534,17 +560,7 @@
                 </div>
             </div>`;
         }
-        function renderFiles() {
-            filesList.innerHTML = '';
-            const clientFiles = filesData[currentClientEmail] || [];
-            if (clientFiles.length === 0) { filesList.innerHTML = `<tr><td colspan="4" class="text-center py-8 text-[var(--brand-text-secondary)]">No hay archivos para este cliente.</td></tr>`; return; }
-            clientFiles.forEach(file => {
-                const fileIcon = file.name.endsWith('.pdf') ? 'file-text' : (file.name.endsWith('.xlsx') ? 'file-spreadsheet' : 'file');
-                filesList.innerHTML += `<tr class="border-b border-[var(--brand-border)]"><td class="px-6 py-4 font-medium flex items-center gap-3"><i data-lucide="${fileIcon}" class="w-5 h-5 text-[var(--brand-turquoise)]"></i>${file.name}</td><td class="px-6 py-4 text-[var(--brand-text-secondary)]">${file.author}</td><td class="px-6 py-4 text-[var(--brand-text-secondary)]">${file.date}</td><td class="px-6 py-4 text-right"><button class="text-[var(--brand-text-secondary)] hover:text-white"><i data-lucide="download-cloud"></i></button></td></tr>`;
-            });
-            lucide.createIcons();
-        }
-
+       
         // --- DASHBOARD & HOURS LOGIC ---
         function calculateCurrentMonthHours() {
             const now = new Date();
@@ -639,7 +655,7 @@
             if (!userInput) return;
 
             appendChatMessage(userInput, 'user');
-            aiInput.value = '';
+aiInput.value = '';
             appendChatMessage('<div class="gemini-thinking"><div class="shimmer w-24 h-4 rounded-md"></div></div>', 'ai', true);
 
             const geminiResponse = await callGeminiAPI(chatHistory);
@@ -706,41 +722,40 @@
              userInfoModule.innerHTML = '';
              if (currentUser.role === 'Admin') {
                 userInfoModule.innerHTML = `
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-xl font-semibold text-white">Gestión de Usuarios</h3>
-                    <button onclick="openUserModal()" class="bg-[var(--brand-turquoise)] text-black font-semibold px-4 py-2 rounded-lg text-sm flex items-center gap-2">
-                        <i data-lucide="plus" class="w-4 h-4"></i>Crear Usuario
-                    </button>
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h3 class="text-xl font-semibold text-white">Gestión de Usuarios</h3>
+                        <p class="text-[var(--brand-text-secondary)]">Selecciona un cliente para ver su Kanban y métricas.</p>
+                    </div>
+                     <div class="flex items-center gap-4">
+                        <select id="client-selector" class="bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[var(--brand-turquoise)] transition text-sm"></select>
+                        <button onclick="openUserModal()" class="bg-[var(--brand-turquoise)] text-black font-semibold px-4 py-2 rounded-lg text-sm flex items-center gap-2">
+                            <i data-lucide="plus" class="w-4 h-4"></i>Crear Usuario
+                        </button>
+                    </div>
                 </div>
                 <div class="bg-[var(--brand-card-bg)] border border-[var(--brand-border)] rounded-lg overflow-hidden">
                     <table class="w-full text-sm text-left">
-                        <thead class="bg-gray-800 text-[var(--brand-text-secondary)] uppercase"><tr><th scope="col" class="px-6 py-3">Usuario</th><th scope="col" class="px-6 py-3">Empresa</th><th scope="col" class="px-6 py-3">Rol</th></tr></thead>
+                        <thead class="bg-gray-800 text-[var(--brand-text-secondary)] uppercase"><tr><th scope="col" class="px-6 py-3">Usuario</th><th scope="col" class="px-6 py-3">Empresa</th><th scope="col" class="px-6 py-3">Rol</th><th scope="col" class="px-6 py-3"></th></tr></thead>
                         <tbody id="user-table-body"></tbody>
                     </table>
                 </div>`;
+                
+                populateClientSelector();
+                document.getElementById('client-selector').addEventListener('change', handleClientChange);
+
                 const userTableBody = document.getElementById('user-table-body');
                 userTableBody.innerHTML = '';
                 sampleUsers.forEach(user => {
                     const row = document.createElement('tr');
                     row.className = 'border-b border-[var(--brand-border)]';
-                    row.innerHTML = `<td class="px-6 py-4 font-medium flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center font-bold text-sm">${user.avatar}</div><div><p class="text-white">${user.name}</p><p class="text-xs text-[var(--brand-text-secondary)]">${user.email}</p></div></td><td class="px-6 py-4 text-[var(--brand-text-secondary)]">${user.company || 'N/A'}</td><td class="px-6 py-4"><select data-user-email="${user.email}" class="user-role-selector w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-1 px-2 text-xs"><option value="Editor" ${user.role === 'Editor' ? 'selected' : ''}>Editor</option><option value="Visualizador" ${user.role === 'Visualizador' ? 'selected' : ''}>Visualizador</option><option value="Admin" ${user.role === 'Admin' ? 'selected' : ''}>Admin</option><option value="Inactivo" ${user.role === 'Inactivo' ? 'selected' : ''}>Inactivo</option></select></td>`;
+                    row.innerHTML = `<td class="px-6 py-4 font-medium flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center font-bold text-sm">${user.avatar}</div><div><p class="text-white">${user.name || '<i>Sin nombre</i>'}</p><p class="text-xs text-[var(--brand-text-secondary)]">${user.email}</p></div></td><td class="px-6 py-4 text-[var(--brand-text-secondary)]">${user.company || 'N/A'}</td><td class="px-6 py-4 text-[var(--brand-text-secondary)]">${user.role}</td><td class="px-6 py-4 text-right"><button onclick="openUserModal('${user.email}')" class="text-[var(--brand-text-secondary)] hover:text-white"><i data-lucide="edit"></i></button></td>`;
                     userTableBody.appendChild(row);
                 });
-                document.querySelectorAll('.user-role-selector').forEach(selector => {
-                    selector.addEventListener('change', (e) => {
-                        const userEmail = e.target.dataset.userEmail;
-                        const newRole = e.target.value;
-                        const userToUpdate = sampleUsers.find(u => u.email === userEmail);
-                        if (userToUpdate) { userToUpdate.role = newRole; }
-                    });
-                });
+                
                 lucide.createIcons();
              } else {
-                 userInfoModule.innerHTML = `<div class="max-w-xl mx-auto bg-[var(--brand-card-bg)] p-8 rounded-lg border border-[var(--brand-border)]"><form id="user-profile-form"><div class="flex flex-col items-center"><div id="profile-avatar-display" class="w-24 h-24 rounded-full bg-gray-700 flex items-center justify-center font-bold text-4xl text-white ring-4 ring-[var(--brand-turquoise)] mb-4">${currentUser.avatar}</div></div><div class="space-y-4 mt-6"><div><label for="profile-name" class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1">Nombre Completo</label><input type="text" id="profile-name" value="${currentUser.name}" readonly class="profile-input w-full rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-[var(--brand-turquoise)] transition"></div><div><label for="profile-email" class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1">Correo Electrónico</label><input type="email" id="profile-email" value="${currentUser.email}" readonly class="profile-input w-full rounded-lg py-2 px-3 text-gray-400 cursor-not-allowed"></div><div><label for="profile-company" class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1">Empresa</label><input type="text" id="profile-company" value="${currentUser.company || ''}" readonly class="profile-input w-full rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-[var(--brand-turquoise)] transition"></div><div><label for="profile-title" class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1">Cargo</label><input type="text" id="profile-title" value="${currentUser.title || ''}" readonly class="profile-input w-full rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-[var(--brand-turquoise)] transition"></div></div><div class="mt-6 flex justify-end gap-3"><button type="button" id="edit-profile-btn" class="px-4 py-2 rounded-lg text-sm font-semibold bg-gray-600 hover:bg-gray-500 transition">Editar Perfil</button><button type="button" id="cancel-edit-btn" class="hidden px-4 py-2 rounded-lg text-sm font-semibold bg-gray-600 hover:bg-gray-500 transition">Cancelar</button><button type="submit" id="save-profile-btn" class="hidden px-4 py-2 rounded-lg text-sm font-semibold bg-[var(--brand-turquoise)] text-black hover:opacity-90 transition">Guardar Cambios</button></div></form></div>`;
-                 const form = document.getElementById('user-profile-form'), editBtn = document.getElementById('edit-profile-btn'), saveBtn = document.getElementById('save-profile-btn'), cancelBtn = document.getElementById('cancel-edit-btn'), inputs = form.querySelectorAll('input:not(#profile-email)');
-                 editBtn.addEventListener('click', () => { inputs.forEach(input => input.readOnly = false); editBtn.classList.add('hidden'); saveBtn.classList.remove('hidden'); cancelBtn.classList.remove('hidden'); });
-                 cancelBtn.addEventListener('click', () => { inputs.forEach(input => input.readOnly = true); editBtn.classList.remove('hidden'); saveBtn.classList.add('hidden'); cancelBtn.classList.add('hidden'); document.getElementById('profile-name').value = currentUser.name; document.getElementById('profile-company').value = currentUser.company || ''; document.getElementById('profile-title').value = currentUser.title || ''; });
-                 form.addEventListener('submit', (e) => { e.preventDefault(); const newName = document.getElementById('profile-name').value; currentUser.name = newName; currentUser.company = document.getElementById('profile-company').value; currentUser.title = document.getElementById('profile-title').value; currentUser.avatar = newName.split(' ').map(n => n[0]).join('').toUpperCase(); document.getElementById('profile-avatar-display').textContent = currentUser.avatar; document.getElementById('user-avatar').textContent = currentUser.avatar; inputs.forEach(input => input.readOnly = true); editBtn.classList.remove('hidden'); saveBtn.classList.add('hidden'); cancelBtn.classList.add('hidden'); });
+                 userInfoModule.innerHTML = `<div class="max-w-xl mx-auto bg-[var(--brand-card-bg)] p-8 rounded-lg border border-[var(--brand-border)]"><div class="flex flex-col items-center"><div id="profile-avatar-display" class="w-24 h-24 rounded-full bg-gray-700 flex items-center justify-center font-bold text-4xl text-white ring-4 ring-[var(--brand-turquoise)] mb-4">${currentUser.avatar}</div></div><div class="space-y-4 mt-6"><div><label class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1">Nombre Completo</label><p class="profile-input w-full rounded-lg py-2 px-3">${currentUser.name}</p></div><div><label class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1">Correo Electrónico</label><p class="profile-input w-full rounded-lg py-2 px-3">${currentUser.email}</p></div><div><label class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1">Empresa</label><p class="profile-input w-full rounded-lg py-2 px-3">${currentUser.company || ''}</p></div><div><label class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1">Cargo</label><p class="profile-input w-full rounded-lg py-2 px-3">${currentUser.title || ''}</p></div></div></div>`;
              }
         }
         
