@@ -1,18 +1,52 @@
-rules_version='2'
+// firestore.rules
+
+rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      // This rule allows anyone with your database reference to view, edit,
-      // and delete all data in your database. It is useful for getting
-      // started, but it is configured to expire after 30 days because it
-      // leaves your app open to attackers. At that time, all client
-      // requests to your database will be denied.
-      //
-      // Make sure to write security rules for your app before that time, or
-      // else all client requests to your database will be denied until you
-      // update your rules.
-      allow read, write: if request.time < timestamp.date(2025, 10, 20);
+
+    // --- FUNCIONES DE AYUDA ---
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isSuperuser() {
+      return request.auth.token.role == 'Superuser';
+    }
+
+    function isUserOfCompany(companyId) {
+      return request.auth.token.companyId == companyId;
+    }
+
+    function isAdminOfCompany(companyId) {
+      return isUserOfCompany(companyId) && request.auth.token.role == 'Admin';
+    }
+
+    // --- REGLAS PARA COLECCIONES ---
+    match /users/{userId} {
+      // Un Superuser puede hacer todo.
+      // Un usuario puede leer y actualizar su propio perfil.
+      allow read, update: if isSuperuser() || request.auth.uid == userId;
+      // Un Admin puede leer los perfiles de su propia empresa.
+      allow list: if isAdminOfCompany(resource.data.companyId);
+    }
+
+    match /companies/{companyId} {
+      // Solo un Superuser puede crear o eliminar empresas.
+      allow create, delete: if isSuperuser();
+      // Un Admin puede leer y actualizar su propia empresa.
+      allow read, update: if isAdminOfCompany(companyId);
+      // Un Usuario puede leer los datos de su empresa.
+      allow get: if isUserOfCompany(companyId);
+
+      // Reglas para la subcolección de tareas
+      match /tasks/{taskId} {
+        // El Admin o Usuario de la empresa puede leer y crear tareas.
+        allow read, create: if isAdminOfCompany(companyId) || isUserOfCompany(companyId);
+        // El Admin puede actualizar/borrar cualquier tarea de su empresa.
+        // Un usuario solo puede actualizar/borrar las tareas que él creó.
+        allow update, delete: if isAdminOfCompany(companyId) || (isUserOfCompany(companyId) && resource.data.createdBy == request.auth.uid);
+      }
     }
   }
 }

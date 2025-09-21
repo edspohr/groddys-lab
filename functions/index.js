@@ -1,32 +1,50 @@
+// functions/index.js
+
+const functions = require("firebase-functions");
+const admin = require("firebase-admin");
+
+admin.initializeApp();
+
 /**
- * Import function triggers from their respective submodules:
- *
- * const {onCall} = require("firebase-functions/v2/https");
- * const {onDocumentWritten} = require("firebase-functions/v2/firestore");
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
+ * Cloud Function para asignar un rol y un ID de empresa a un usuario.
+ * Solo puede ser llamada por un usuario que ya sea Superuser.
  */
+exports.setUserRole = functions.https.onCall(async (data, context) => {
+  // 1. Verifica que el usuario que llama a la función es un Superuser.
+  if (context.auth.token.role !== "Superuser") {
+    throw new functions.https.HttpsError(
+        "permission-denied",
+        "Solo un Superuser puede ejecutar esta acción.",
+    );
+  }
 
-const {setGlobalOptions} = require("firebase-functions");
-const {onRequest} = require("firebase-functions/https");
-const logger = require("firebase-functions/logger");
+  // 2. Valida los datos de entrada.
+  const {email, role, companyId} = data;
+  if (!email || !role || !companyId) {
+    throw new functions.https.HttpsError(
+        "invalid-argument",
+        "La función requiere \"email\", \"role\" y \"companyId\".",
+    );
+  }
 
-// For cost control, you can set the maximum number of containers that can be
-// running at the same time. This helps mitigate the impact of unexpected
-// traffic spikes by instead downgrading performance. This limit is a
-// per-function limit. You can override the limit for each function using the
-// `maxInstances` option in the function's options, e.g.
-// `onRequest({ maxInstances: 5 }, (req, res) => { ... })`.
-// NOTE: setGlobalOptions does not apply to functions using the v1 API. V1
-// functions should each use functions.runWith({ maxInstances: 10 }) instead.
-// In the v1 API, each function can only serve one request per container, so
-// this will be the maximum concurrent request count.
-setGlobalOptions({ maxInstances: 10 });
+  try {
+    // 3. Busca al usuario por su email.
+    const user = await admin.auth().getUserByEmail(email);
 
-// Create and deploy your first functions
-// https://firebase.google.com/docs/functions/get-started
+    // 4. Asigna los roles personalizados (Custom Claims).
+    await admin.auth().setCustomUserClaims(user.uid, {
+      role: role,
+      companyId: companyId,
+    });
 
-// exports.helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+    console.log(`Rol "${role}" asignado a ${email} 
+      para la empresa ${companyId}`);
+    return {message: `Éxito! El usuario ${email} 
+    ahora tiene el rol de ${role}.`};
+  } catch (error) {
+    console.error("Error al asignar rol:", error);
+    throw new functions.https.HttpsError(
+        "internal", "Ocurrió un error al asignar el rol.",
+    );
+  }
+});
