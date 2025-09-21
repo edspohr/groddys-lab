@@ -1,89 +1,178 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Welcome to Firebase Hosting</title>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Groddy's Lab - Portal de Cliente</title>
+    <link rel="icon" type="image/png" href="img/favicon.png">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@0.395.0/dist/umd/lucide.min.js"></script>
 
-    <!-- update the version number as needed -->
-    <script defer src="/__/firebase/12.3.0/firebase-app-compat.js"></script>
-    <!-- include only the Firebase features as you need -->
-    <script defer src="/__/firebase/12.3.0/firebase-auth-compat.js"></script>
-    <script defer src="/__/firebase/12.3.0/firebase-database-compat.js"></script>
-    <script defer src="/__/firebase/12.3.0/firebase-firestore-compat.js"></script>
-    <script defer src="/__/firebase/12.3.0/firebase-functions-compat.js"></script>
-    <script defer src="/__/firebase/12.3.0/firebase-messaging-compat.js"></script>
-    <script defer src="/__/firebase/12.3.0/firebase-storage-compat.js"></script>
-    <script defer src="/__/firebase/12.3.0/firebase-analytics-compat.js"></script>
-    <script defer src="/__/firebase/12.3.0/firebase-remote-config-compat.js"></script>
-    <script defer src="/__/firebase/12.3.0/firebase-performance-compat.js"></script>
-    <!-- 
-      initialize the SDK after all desired features are loaded, set useEmulator to false
-      to avoid connecting the SDK to running emulators.
-    -->
-    <script defer src="/__/firebase/init.js?useEmulator=true"></script>
+    <!-- Chart.js for dynamic graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
 
-    <style media="screen">
-      body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
-      #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; }
-      #message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
-      #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
-      #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
-      #message a { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
-      #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
-      #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
-      @media (max-width: 600px) {
-        body, #message { margin-top: 0; background: white; box-shadow: none; }
-        body { border-top: 16px solid #ffa100; }
-      }
-    </style>
-  </head>
-  <body>
-    <div id="message">
-      <h2>Welcome</h2>
-      <h1>Firebase Hosting Setup Complete</h1>
-      <p>You're seeing this because you've successfully setup Firebase Hosting. Now it's time to go build something extraordinary!</p>
-      <a target="_blank" href="https://firebase.google.com/docs/hosting/">Open Hosting Documentation</a>
-    </div>
-    <p id="load">Firebase SDK Loading&hellip;</p>
-
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        const loadEl = document.querySelector('#load');
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
-        // // The Firebase SDK is initialized and available here!
-        //
-        // firebase.auth().onAuthStateChanged(user => { });
-        // firebase.database().ref('/path/to/ref').on('value', snapshot => { });
-        // firebase.firestore().doc('/foo/bar').get().then(() => { });
-        // firebase.functions().httpsCallable('yourFunction')().then(() => { });
-        // firebase.messaging().requestPermission().then(() => { });
-        // firebase.storage().ref('/path/to/ref').getDownloadURL().then(() => { });
-        // firebase.analytics(); // call to activate
-        // firebase.analytics().logEvent('tutorial_completed');
-        // firebase.performance(); // call to activate
-        //
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
-
-        try {
-          let app = firebase.app();
-          let features = [
-            'auth', 
-            'database', 
-            'firestore',
-            'functions',
-            'messaging', 
-            'storage', 
-            'analytics', 
-            'remoteConfig',
-            'performance',
-          ].filter(feature => typeof app[feature] === 'function');
-          loadEl.textContent = `Firebase SDK loaded with ${features.join(', ')}`;
-        } catch (e) {
-          console.error(e);
-          loadEl.textContent = 'Error loading the Firebase SDK, check the console.';
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0D1117;
         }
-      });
-    </script>
-  </body>
+        :root {
+            --brand-dark-bg: #0D1117;
+            --brand-card-bg: #161B22;
+            --brand-border: #30363D;
+            --brand-turquoise: #00f6ff;
+            --brand-text-primary: #E6EDF3;
+            --brand-text-secondary: #8B949E;
+        }
+        .sidebar-icon { transition: all 0.2s ease-in-out; }
+        .sidebar-icon:hover, .sidebar-icon.active { background-color: var(--brand-turquoise); color: var(--brand-dark-bg); }
+        .k-card { transition: all 0.2s ease-in-out; cursor: pointer; }
+        .k-card:hover { transform: translateY(-4px); border-color: var(--brand-turquoise); }
+        .module { display: none; animation: fadeIn 0.5s; }
+        .module.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .kanban-column { min-height: 400px; }
+        .kanban-card:not(.no-drag) { cursor: grab !important; }
+        .kanban-card:active:not(.no-drag) { cursor: grabbing !important; }
+        .dragging { opacity: 0.5; }
+
+        .admin-only, .editor-only { display: none !important; }
+        body.admin-view .admin-only { display: flex !important; }
+        body.admin-view .admin-only-block { display: block !important; }
+        body.editor-view .editor-only { display: flex !important; }
+        body.editor-view .editor-only-block { display: block !important; }
+        
+        @keyframes shimmer { 0% { background-position: -1000px 0; } 100% { background-position: 1000px 0; } }
+        .gemini-thinking .shimmer { animation: shimmer 2s infinite linear; background: linear-gradient(to right, transparent 20%, #30363D 50%, transparent 80%); background-size: 1000px 100%; }
+        
+        .profile-input { background-color: transparent; border: 1px solid transparent; }
+        .profile-input:not([readonly]) { background-color: #0D1117; border-color: var(--brand-border); }
+
+        #notifications-panel { transition: transform 0.3s ease-in-out; }
+    </style>
+</head>
+<body class="text-[var(--brand-text-primary)]">
+
+    <!-- Pantalla de Login -->
+    <div id="login-screen" class="relative flex flex-col items-center justify-center min-h-screen overflow-hidden p-4">
+        <video autoplay loop muted playsinline class="absolute top-0 left-0 w-full h-full object-cover z-0">
+            <source src="vid/login.mp4" type="video/mp4">
+            Tu navegador no soporta la etiqueta de video.
+        </video>
+        <div class="absolute top-0 left-0 w-full h-full bg-black/60 z-1"></div>
+        <div class="w-full max-w-sm z-10">
+            <div class="flex flex-col items-center mb-8">
+                <img src="img/logo.png" alt="Logo de Groddy's Lab" class="w-16 h-16">
+                <h1 class="text-3xl font-bold text-white mt-4">Groddy's Lab</h1>
+                <p class="text-[var(--brand-text-secondary)]">Portal de Cliente</p>
+            </div>
+            <form id="login-form" class="bg-[var(--brand-card-bg)]/80 backdrop-blur-sm p-8 rounded-lg border border-[var(--brand-border)]">
+                <div id="login-error" class="hidden bg-red-900/50 text-red-300 text-sm p-3 rounded-lg mb-4 text-center"></div>
+                <div class="space-y-4">
+                    <div>
+                        <label for="login-email" class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1">Correo Electrónico</label>
+                        <input type="email" id="login-email" value="cliente@empresa.com" autocomplete="email" required class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[var(--brand-turquoise)] transition text-sm">
+                    </div>
+                    <div>
+                        <label for="login-password" class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1">Contraseña</label>
+                        <input type="password" id="login-password" autocomplete="current-password" required class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[var(--brand-turquoise)] transition text-sm" value="password">
+                    </div>
+                </div>
+                <button type="submit" class="w-full bg-[var(--brand-turquoise)] text-black font-bold py-2.5 rounded-lg hover:opacity-90 transition-opacity mt-6">Ingresar</button>
+                <div class="relative flex items-center justify-center my-6">
+                    <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-[var(--brand-border)]"></div></div>
+                    <div class="relative bg-transparent px-2 text-sm text-[var(--brand-text-secondary)]">o</div>
+                </div>
+                 <button type="button" class="w-full bg-transparent border border-[var(--brand-border)] hover:bg-gray-800 text-white font-semibold py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"></path><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.574l6.19,5.238C42.021,35.591,44,30.138,44,24C44,22.659,43.862,21.35,43.611,20.083z"></path></svg>
+                    <span>Ingresar con Google</span>
+                </button>
+            </form>
+            <a href="https://www.growthbuddies.cl/" class="mt-8 text-center text-sm text-[var(--brand-text-secondary)] hover:text-white transition-colors flex items-center justify-center gap-2">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                <span>Volver a Growth Buddies</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Portal de la Aplicación (Oculto inicialmente) -->
+    <div id="app-portal" class="hidden h-screen bg-[var(--brand-dark-bg)]">
+        <!-- Sidebar -->
+        <aside class="w-20 bg-[var(--brand-card-bg)] border-r border-[var(--brand-border)] text-[var(--brand-text-secondary)] flex flex-col items-center py-6 space-y-6 z-30">
+             <img src="img/logo.png" alt="Logo de Groddy's Lab" class="w-10 h-10">
+            <nav class="flex flex-col items-center space-y-4 flex-grow">
+                <button onclick="showModule('dashboard-kanban')" class="sidebar-icon active p-3 rounded-xl" data-tooltip="Dashboard"><i data-lucide="layout-dashboard"></i></button>
+                <button onclick="showModule('ai-agent')" class="sidebar-icon p-3 rounded-xl flex items-center justify-center" data-tooltip="Groddy AI"><span class="font-bold text-base">AI</span></button>
+                <button onclick="showModule('user-info')" class="sidebar-icon p-3 rounded-xl" data-tooltip="Mi Perfil"><i data-lucide="user-circle"></i></button>
+            </nav>
+            <div class="flex flex-col items-center space-y-4">
+                <button id="notifications-btn" onclick="toggleNotifications()" class="sidebar-icon p-3 rounded-xl relative" data-tooltip="Notificaciones"><i data-lucide="bell"></i><span id="notifications-indicator" class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full hidden"></span></button>
+                <div id="user-avatar" class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center font-bold text-lg text-white ring-2 ring-[var(--brand-turquoise)] cursor-pointer"></div>
+                <button onclick="logout()" class="sidebar-icon p-3 rounded-xl" data-tooltip="Cerrar Sesión"><i data-lucide="log-out" class="w-5 h-5"></i></button>
+            </div>
+        </aside>
+
+        <!-- Notification Panel -->
+        <div id="notifications-panel" class="fixed top-0 left-20 h-full w-80 bg-[var(--brand-card-bg)] border-r border-[var(--brand-border)] z-20 p-4 transform -translate-x-full"><div class="flex justify-between items-center mb-4"><h3 class="font-bold text-white">Notificaciones</h3><button onclick="toggleNotifications()" class="text-[var(--brand-text-secondary)] hover:text-white"><i data-lucide="x"></i></button></div><div id="notifications-list" class="space-y-3"></div></div>
+
+        <!-- Contenido Principal -->
+        <main class="flex-1 p-6 md:p-8 overflow-y-auto">
+            <header class="flex justify-between items-center mb-8">
+                 <div><h1 id="module-title" class="text-3xl font-bold text-white"></h1><p id="module-description" class="text-[var(--brand-text-secondary)]"></p></div>
+            </header>
+
+            <!-- Módulos -->
+            <div id="dashboard-kanban" class="module">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                    <div class="lg:col-span-1 bg-[var(--brand-card-bg)] p-5 rounded-lg border border-[var(--brand-border)]"><h4 class="font-semibold text-[var(--brand-text-secondary)]">Horas Ahorradas (Mes Actual)</h4><p id="total-hours-saved" class="text-4xl font-bold mt-2 text-white">0h</p><p class="text-sm text-[var(--brand-turquoise)] flex items-center mt-1">Impacto total de tareas completadas.</p></div>
+                    <div class="lg:col-span-2 bg-[var(--brand-card-bg)] p-6 rounded-lg border border-[var(--brand-border)]"><h3 class="text-lg font-semibold text-white mb-4">Evolución de Horas Ahorradas</h3><div class="h-48"><canvas id="hoursChart"></canvas></div></div>
+                </div>
+                <div class="flex justify-end mb-4 editor-only">
+                    <button id="archive-tasks-btn" class="bg-blue-600 hover:bg-blue-500 text-white font-semibold px-4 py-2 rounded-lg text-sm flex items-center gap-2 transition-colors"><i data-lucide="archive" class="w-4 h-4"></i>Archivar Tareas Completadas</button>
+                </div>
+                <div id="kanban-board" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="kanban-column" data-column-id="todo" ondragover="event.preventDefault()" ondrop="drop(event)"><div class="flex justify-between items-center mb-4"><h3 class="font-semibold text-white">To Do</h3><button onclick="openTaskDetails(null, 'todo')" class="editor-only text-[var(--brand-text-secondary)] hover:text-white"><i data-lucide="plus-circle" class="w-5 h-5"></i></button></div><div class="space-y-4"></div></div>
+                    <div class="kanban-column" data-column-id="inprogress" ondragover="event.preventDefault()" ondrop="drop(event)"><div class="flex justify-between items-center mb-4"><h3 class="font-semibold text-white">In Progress</h3></div><div class="space-y-4"></div></div>
+                    <div class="kanban-column" data-column-id="review" ondragover="event.preventDefault()" ondrop="drop(event)"><div class="flex justify-between items-center mb-4"><h3 class="font-semibold text-white">For Review</h3></div><div class="space-y-4"></div></div>
+                    <div class="kanban-column" data-column-id="done" ondragover="event.preventDefault()" ondrop="drop(event)"><div class="flex justify-between items-center mb-4"><h3 class="font-semibold text-white">Done</h3></div><div class="space-y-4"></div></div>
+                </div>
+                 <div class="mt-12"><h3 class="text-xl font-semibold text-white mb-4">Historial de Tareas Completadas</h3><div id="history-list" class="bg-[var(--brand-card-bg)] border border-[var(--brand-border)] rounded-lg p-4 max-h-80 overflow-y-auto space-y-3"><p class="text-center text-[var(--brand-text-secondary)]">Aún no hay tareas archivadas.</p></div></div>
+            </div>
+            <div id="ai-agent" class="module"><div class="max-w-3xl mx-auto"><div class="bg-[var(--brand-card-bg)] border border-[var(--brand-border)] rounded-lg shadow-lg"><div id="chat-messages" class="p-6 h-[32rem] overflow-y-auto space-y-4"></div><div class="p-4 border-t border-[var(--brand-border)]"><form id="ai-form" class="flex items-center gap-3"><input id="ai-input" type="text" placeholder="Describe una idea o un problema..." class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[var(--brand-turquoise)] transition text-sm"><button type="submit" class="bg-[var(--brand-turquoise)] text-[var(--brand-dark-bg)] px-4 py-2 rounded-lg font-semibold hover:opacity-90 transition">Enviar</button></form></div></div></div></div>
+            <div id="user-info" class="module"></div>
+        </main>
+    </div>
+    
+    <!-- Modals -->
+    <div id="task-detail-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden items-center justify-center z-50 p-4"><div class="bg-[var(--brand-card-bg)] p-6 rounded-lg border border-[var(--brand-border)] w-full max-w-2xl max-h-[90vh] flex flex-col"><div class="flex-shrink-0"><h2 id="modal-title" class="text-xl font-bold mb-6 text-white"></h2><form id="task-form" class="space-y-4"><input type="hidden" id="task-id"><input type="hidden" id="task-column"><div><label for="task-title" class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1">Título</label><input type="text" id="task-title" class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[var(--brand-turquoise)] transition text-sm" required></div><div><label for="task-description" class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1">Descripción</label><textarea id="task-description" rows="3" class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[var(--brand-turquoise)] transition text-sm"></textarea></div><div class="grid grid-cols-2 md:grid-cols-4 gap-4"><div><label for="task-priority" class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1">Prioridad</label><select id="task-priority" class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4"><option value="low">Baja</option><option value="medium">Media</option><option value="high">Alta</option></select></div><div><label for="task-impact" class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1">Ahorro Indiv.</label><input type="number" id="task-impact" placeholder="Horas" class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4"></div><div><label for="task-users-affected" class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1">Usuarios Afect.</label><input type="number" id="task-users-affected" placeholder="Cantidad" class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4"></div><div><label for="task-type" class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1">Recurrencia</label><select id="task-type" class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4"><option value="once">Único</option><option value="recurring">Recurrente</option></select></div></div></form></div><div class="flex-grow mt-6 pt-4 border-t border-[var(--brand-border)] overflow-y-auto"><h3 class="text-lg font-semibold text-white mb-3">Comentarios</h3><div id="comments-section" class="space-y-4"></div></div><div class="flex-shrink-0 mt-6 pt-4 border-t border-[var(--brand-border)]"><form id="comment-form" class="flex items-center gap-2"><input id="comment-input" type="text" placeholder="Escribe un comentario..." class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-3 text-sm"><button type="submit" class="px-4 py-2 rounded-lg text-sm font-semibold bg-[var(--brand-turquoise)] text-black">Enviar</button></form><div class="flex justify-end gap-3 mt-4"><button type="button" onclick="closeTaskDetails()" class="px-4 py-2 rounded-lg text-sm font-semibold bg-gray-600 hover:bg-gray-500 transition">Cerrar</button><button type="button" id="save-task-btn" class="px-4 py-2 rounded-lg text-sm font-semibold bg-[var(--brand-turquoise)] text-black hover:opacity-90 transition editor-only">Guardar Cambios</button></div></div></div></div>
+    <div id="user-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden items-center justify-center z-50 p-4">
+        <div class="bg-[var(--brand-card-bg)] p-6 rounded-lg border border-[var(--brand-border)] w-full max-w-md">
+            <h2 id="user-modal-title" class="text-xl font-bold mb-6 text-white"></h2>
+            <form id="user-form" class="space-y-4">
+                 <input type="hidden" id="user-id">
+                <div><label for="user-email" class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1">Correo Electrónico</label><input type="email" id="user-email" required class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4"></div>
+                <div><label for="user-name" class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1">Nombre Completo</label><input type="text" id="user-name" class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4"></div>
+                <div><label for="user-company" class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1">Empresa</label><input type="text" id="user-company" class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4"></div>
+                <div><label for="user-title" class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1">Cargo</label><input type="text" id="user-title" class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4"></div>
+                <div><label for="user-role" class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1">Rol</label><select id="user-role" class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4"><option value="Editor">Editor</option><option value="Visualizador">Visualizador</option><option value="Admin">Admin</option><option value="Inactivo">Inactivo</option></select></div>
+                <div class="mt-6 flex justify-end gap-3">
+                    <button type="button" onclick="closeUserModal()" class="px-4 py-2 rounded-lg text-sm font-semibold bg-gray-600 hover:bg-gray-500 transition">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 rounded-lg text-sm font-semibold bg-[var(--brand-turquoise)] text-black hover:opacity-90 transition">Guardar Usuario</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script type="module" src="app.js"></script>
+</body>
 </html>
