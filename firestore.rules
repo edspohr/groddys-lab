@@ -22,31 +22,65 @@ service cloud.firestore {
       return isUserOfCompany(companyId) && request.auth.token.role == 'Admin';
     }
 
-    // --- REGLAS PARA COLECCIONES ---
-    match /users/{userId} {
-      // Un Superuser puede hacer todo.
-      // Un usuario puede leer y actualizar su propio perfil.
-      allow read, update: if isSuperuser() || request.auth.uid == userId;
-      // Un Admin puede leer los perfiles de su propia empresa.
-      allow list: if isAdminOfCompany(resource.data.companyId);
+    function isPremium() {
+      return request.auth.token.tier == 'premium';
     }
 
+    // --- USUARIOS ---
+    match /users/{userId} {
+      // Un usuario puede crear su propio perfil (auto-registro)
+      allow create: if isSignedIn() && request.auth.uid == userId;
+      // Un usuario puede leer y actualizar su propio perfil
+      allow read, update: if isSuperuser() || request.auth.uid == userId;
+      // Superuser puede listar todos los usuarios
+      // Un Admin puede leer los perfiles de su propia empresa
+      allow list: if isSuperuser() || isAdminOfCompany(resource.data.companyId);
+
+      // TAREAS PERSONALES (Freemium Task Optimizer)
+      match /tasks/{taskId} {
+        allow read, write: if request.auth.uid == userId;
+      }
+    }
+
+    // --- EMPRESAS Y TAREAS ---
     match /companies/{companyId} {
-      // Solo un Superuser puede crear o eliminar empresas.
       allow create, delete: if isSuperuser();
-      // Un Admin puede leer y actualizar su propia empresa.
       allow read, update: if isAdminOfCompany(companyId);
-      // Un Usuario puede leer los datos de su empresa.
       allow get: if isUserOfCompany(companyId);
 
-      // Reglas para la subcolección de tareas
       match /tasks/{taskId} {
-        // El Admin o Usuario de la empresa puede leer y crear tareas.
         allow read, create: if isAdminOfCompany(companyId) || isUserOfCompany(companyId);
-        // El Admin puede actualizar/borrar cualquier tarea de su empresa.
-        // Un usuario solo puede actualizar/borrar las tareas que él creó.
         allow update, delete: if isAdminOfCompany(companyId) || (isUserOfCompany(companyId) && resource.data.createdBy == request.auth.uid);
       }
+    }
+
+    // --- CURSOS Y LECCIONES (Academy) ---
+    match /courses/{courseId} {
+      // Todos pueden leer cursos (para ver catálogo)
+      allow read: if true;
+      // Solo superuser puede crear/editar
+      allow write: if isSuperuser();
+
+      match /lessons/{lessonId} {
+        // Permitir lectura a todos para mostrar temario completo (Bloqueo en UI)
+        allow read: if true;
+        allow write: if isSuperuser();
+      }
+    }
+
+    // --- RECURSOS (Biblioteca) ---
+    match /resources/{resourceId} {
+      // Recursos freemium: todos pueden leer
+      // Recursos premium: solo usuarios premium
+      allow read: if resource.data.accessTier == 'freemium' || isPremium() || isSuperuser();
+      allow write: if isSuperuser();
+    }
+
+    // --- PROGRESO DE USUARIO ---
+    match /progress/{progressId} {
+      // Usuario puede leer/escribir su propio progreso
+      allow read, write: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
     }
   }
 }

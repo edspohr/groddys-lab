@@ -1,19 +1,22 @@
 <!DOCTYPE html>
 <html lang="es" class="dark">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Groddy's Lab - Portal de Cliente</title>
-    <link rel="icon" type="image/png" href="img/favicon.png">
-    
+    <link rel="icon" type="image/png" href="img/favicon.png" />
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <!-- Google Fonts: Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@0.395.0/dist/umd/lucide.min.js"></script>
 
@@ -22,157 +25,1268 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
 
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #0D1117;
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #0d1117;
+      }
+      :root {
+        --brand-dark-bg: #0d1117;
+        --brand-card-bg: #161b22;
+        --brand-border: #30363d;
+        --brand-turquoise: #00f6ff;
+        --brand-text-primary: #e6edf3;
+        --brand-text-secondary: #8b949e;
+      }
+      .sidebar-icon {
+        transition: all 0.2s ease-in-out;
+      }
+      .sidebar-icon:hover,
+      .sidebar-icon.active {
+        background-color: var(--brand-turquoise);
+        color: var(--brand-dark-bg);
+      }
+      .k-card {
+        transition: all 0.2s ease-in-out;
+        cursor: pointer;
+      }
+      .k-card:hover {
+        transform: translateY(-4px);
+        border-color: var(--brand-turquoise);
+      }
+      .module {
+        display: none;
+        animation: fadeIn 0.5s;
+      }
+      .module.active {
+        display: block;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
         }
-        :root {
-            --brand-dark-bg: #0D1117;
-            --brand-card-bg: #161B22;
-            --brand-border: #30363D;
-            --brand-turquoise: #00f6ff;
-            --brand-text-primary: #E6EDF3;
-            --brand-text-secondary: #8B949E;
+        to {
+          opacity: 1;
+          transform: translateY(0);
         }
-        .sidebar-icon { transition: all 0.2s ease-in-out; }
-        .sidebar-icon:hover, .sidebar-icon.active { background-color: var(--brand-turquoise); color: var(--brand-dark-bg); }
-        .k-card { transition: all 0.2s ease-in-out; cursor: pointer; }
-        .k-card:hover { transform: translateY(-4px); border-color: var(--brand-turquoise); }
-        .module { display: none; animation: fadeIn 0.5s; }
-        .module.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .kanban-column { min-height: 400px; }
-        .kanban-card:not(.no-drag) { cursor: grab !important; }
-        .kanban-card:active:not(.no-drag) { cursor: grabbing !important; }
-        .dragging { opacity: 0.5; }
+      }
 
-        .admin-only, .editor-only { display: none !important; }
-        body.admin-view .admin-only { display: flex !important; }
-        body.admin-view .admin-only-block { display: block !important; }
-        body.editor-view .editor-only { display: flex !important; }
-        body.editor-view .editor-only-block { display: block !important; }
-        
-        @keyframes shimmer { 0% { background-position: -1000px 0; } 100% { background-position: 1000px 0; } }
-        .gemini-thinking .shimmer { animation: shimmer 2s infinite linear; background: linear-gradient(to right, transparent 20%, #30363D 50%, transparent 80%); background-size: 1000px 100%; }
-        
-        .profile-input { background-color: transparent; border: 1px solid transparent; }
-        .profile-input:not([readonly]) { background-color: #0D1117; border-color: var(--brand-border); }
+      .kanban-column {
+        min-height: 400px;
+      }
+      .kanban-card:not(.no-drag) {
+        cursor: grab !important;
+      }
+      .kanban-card:active:not(.no-drag) {
+        cursor: grabbing !important;
+      }
+      .dragging {
+        opacity: 0.5;
+      }
 
-        #notifications-panel { transition: transform 0.3s ease-in-out; }
+      .admin-only,
+      .editor-only {
+        display: none !important;
+      }
+      body.admin-view .admin-only {
+        display: flex !important;
+      }
+      body.admin-view .admin-only-block {
+        display: block !important;
+      }
+      body.editor-view .editor-only {
+        display: flex !important;
+      }
+      body.editor-view .editor-only-block {
+        display: block !important;
+      }
+
+      /* Estilos por tier */
+      .freemium-only {
+        display: none !important;
+      }
+      .premium-only {
+        display: none !important;
+      }
+      body.freemium-view .freemium-only {
+        display: block !important;
+      }
+      body.freemium-view .freemium-only-flex {
+        display: flex !important;
+      }
+      body.premium-view .premium-only {
+        display: block !important;
+      }
+      body.premium-view .premium-only-flex {
+        display: flex !important;
+      }
+
+      @keyframes shimmer {
+        0% {
+          background-position: -1000px 0;
+        }
+        100% {
+          background-position: 1000px 0;
+        }
+      }
+      .gemini-thinking .shimmer {
+        animation: shimmer 2s infinite linear;
+        background: linear-gradient(
+          to right,
+          transparent 20%,
+          #30363d 50%,
+          transparent 80%
+        );
+        background-size: 1000px 100%;
+      }
+
+      .profile-input {
+        background-color: transparent;
+        border: 1px solid transparent;
+      }
+      .profile-input:not([readonly]) {
+        background-color: #0d1117;
+        border-color: var(--brand-border);
+      }
+
+      #notifications-panel {
+        transition: transform 0.3s ease-in-out;
+      }
     </style>
-</head>
-<body class="text-[var(--brand-text-primary)]">
-
+  </head>
+  <body class="text-[var(--brand-text-primary)]">
     <!-- Pantalla de Login -->
-    <div id="login-screen" class="relative flex flex-col items-center justify-center min-h-screen overflow-hidden p-4">
-        <video autoplay loop muted playsinline class="absolute top-0 left-0 w-full h-full object-cover z-0">
-            <source src="vid/login.mp4" type="video/mp4">
-            Tu navegador no soporta la etiqueta de video.
-        </video>
-        <div class="absolute top-0 left-0 w-full h-full bg-black/60 z-1"></div>
-        <div class="w-full max-w-sm z-10">
-            <div class="flex flex-col items-center mb-8">
-                <img src="img/logo.png" alt="Logo de Groddy's Lab" class="w-16 h-16">
-                <h1 class="text-3xl font-bold text-white mt-4">Groddy's Lab</h1>
-                <p class="text-[var(--brand-text-secondary)]">Portal de Cliente</p>
-            </div>
-            <form id="login-form" class="bg-[var(--brand-card-bg)]/80 backdrop-blur-sm p-8 rounded-lg border border-[var(--brand-border)]">
-                <div id="login-error" class="hidden bg-red-900/50 text-red-300 text-sm p-3 rounded-lg mb-4 text-center"></div>
-                <div class="space-y-4">
-                    <div>
-                        <label for="login-email" class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1">Correo Electrónico</label>
-                        <input type="email" id="login-email" value="cliente@empresa.com" autocomplete="email" required class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[var(--brand-turquoise)] transition text-sm">
-                    </div>
-                    <div>
-                        <label for="login-password" class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1">Contraseña</label>
-                        <input type="password" id="login-password" autocomplete="current-password" required class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[var(--brand-turquoise)] transition text-sm" value="password">
-                    </div>
-                </div>
-                <button type="submit" class="w-full bg-[var(--brand-turquoise)] text-black font-bold py-2.5 rounded-lg hover:opacity-90 transition-opacity mt-6">Ingresar</button>
-                <div class="relative flex items-center justify-center my-6">
-                    <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-[var(--brand-border)]"></div></div>
-                    <div class="relative bg-transparent px-2 text-sm text-[var(--brand-text-secondary)]">o</div>
-                </div>
-                 <button type="button" class="w-full bg-transparent border border-[var(--brand-border)] hover:bg-gray-800 text-white font-semibold py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2">
-                    <svg class="w-5 h-5" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"></path><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.574l6.19,5.238C42.021,35.591,44,30.138,44,24C44,22.659,43.862,21.35,43.611,20.083z"></path></svg>
-                    <span>Ingresar con Google</span>
-                </button>
-            </form>
-            <a href="https://www.growthbuddies.cl/" class="mt-8 text-center text-sm text-[var(--brand-text-secondary)] hover:text-white transition-colors flex items-center justify-center gap-2">
-                <i data-lucide="arrow-left" class="w-4 h-4"></i>
-                <span>Volver a Growth Buddies</span>
-            </a>
+    <div
+      id="login-screen"
+      class="relative flex flex-col items-center justify-center min-h-screen overflow-hidden p-4"
+    >
+      <video
+        autoplay
+        loop
+        muted
+        playsinline
+        class="absolute top-0 left-0 w-full h-full object-cover z-0"
+      >
+        <source src="vid/login.mp4" type="video/mp4" />
+        Tu navegador no soporta la etiqueta de video.
+      </video>
+      <div class="absolute top-0 left-0 w-full h-full bg-black/60 z-1"></div>
+      <div class="w-full max-w-sm z-10">
+        <div class="flex flex-col items-center mb-8">
+          <img
+            src="img/logo.png"
+            alt="Logo de Groddy's Lab"
+            class="w-16 h-16"
+          />
+          <h1 class="text-3xl font-bold text-white mt-4">Groddy's Lab</h1>
+          <p class="text-[var(--brand-text-secondary)]">
+            Process Academy + Workspace
+          </p>
         </div>
+
+        <div
+          class="bg-[var(--brand-card-bg)]/80 backdrop-blur-sm p-8 rounded-lg border border-[var(--brand-border)]"
+        >
+          <!-- Tabs Login/Registro -->
+          <div class="flex mb-6 border-b border-[var(--brand-border)]">
+            <button
+              id="tab-login"
+              type="button"
+              class="flex-1 py-2 text-center font-semibold text-white border-b-2 border-[var(--brand-turquoise)] transition-colors"
+            >
+              Iniciar Sesión
+            </button>
+            <button
+              id="tab-register"
+              type="button"
+              class="flex-1 py-2 text-center font-semibold text-[var(--brand-text-secondary)] border-b-2 border-transparent hover:text-white transition-colors"
+            >
+              Registrarse
+            </button>
+          </div>
+
+          <div
+            id="auth-error"
+            class="hidden bg-red-900/50 text-red-300 text-sm p-3 rounded-lg mb-4 text-center"
+          ></div>
+          <div
+            id="auth-success"
+            class="hidden bg-green-900/50 text-green-300 text-sm p-3 rounded-lg mb-4 text-center"
+          ></div>
+
+          <!-- Formulario de Login -->
+          <form id="login-form" class="space-y-4">
+            <div>
+              <label
+                for="login-email"
+                class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1"
+                >Correo Electrónico</label
+              >
+              <input
+                type="email"
+                id="login-email"
+                placeholder="tu@email.com"
+                autocomplete="email"
+                required
+                class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[var(--brand-turquoise)] transition text-sm"
+              />
+            </div>
+            <div>
+              <label
+                for="login-password"
+                class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1"
+                >Contraseña</label
+              >
+              <input
+                type="password"
+                id="login-password"
+                placeholder="••••••••"
+                autocomplete="current-password"
+                required
+                class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[var(--brand-turquoise)] transition text-sm"
+              />
+            </div>
+            <button
+              type="submit"
+              class="w-full bg-[var(--brand-turquoise)] text-black font-bold py-2.5 rounded-lg hover:opacity-90 transition-opacity"
+            >
+              Ingresar
+            </button>
+          </form>
+
+          <!-- Formulario de Registro -->
+          <form id="register-form" class="space-y-4 hidden">
+            <div>
+              <label
+                for="register-name"
+                class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1"
+                >Nombre Completo</label
+              >
+              <input
+                type="text"
+                id="register-name"
+                placeholder="Tu nombre"
+                autocomplete="name"
+                required
+                class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[var(--brand-turquoise)] transition text-sm"
+              />
+            </div>
+            <div>
+              <label
+                for="register-email"
+                class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1"
+                >Correo Electrónico</label
+              >
+              <input
+                type="email"
+                id="register-email"
+                placeholder="tu@email.com"
+                autocomplete="email"
+                required
+                class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[var(--brand-turquoise)] transition text-sm"
+              />
+            </div>
+            <div>
+              <label
+                for="register-password"
+                class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1"
+                >Contraseña</label
+              >
+              <input
+                type="password"
+                id="register-password"
+                placeholder="Mínimo 6 caracteres"
+                autocomplete="new-password"
+                required
+                minlength="6"
+                class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[var(--brand-turquoise)] transition text-sm"
+              />
+            </div>
+            <div>
+              <label
+                for="register-password-confirm"
+                class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1"
+                >Confirmar Contraseña</label
+              >
+              <input
+                type="password"
+                id="register-password-confirm"
+                placeholder="Repite tu contraseña"
+                autocomplete="new-password"
+                required
+                minlength="6"
+                class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[var(--brand-turquoise)] transition text-sm"
+              />
+            </div>
+            <button
+              type="submit"
+              class="w-full bg-[var(--brand-turquoise)] text-black font-bold py-2.5 rounded-lg hover:opacity-90 transition-opacity"
+            >
+              Crear Cuenta Gratis
+            </button>
+            <p class="text-xs text-[var(--brand-text-secondary)] text-center">
+              Al registrarte aceptas nuestros términos y condiciones.
+            </p>
+          </form>
+
+          <div class="relative flex items-center justify-center my-6">
+            <div class="absolute inset-0 flex items-center">
+              <div class="w-full border-t border-[var(--brand-border)]"></div>
+            </div>
+            <div
+              class="relative bg-[var(--brand-card-bg)] px-2 text-sm text-[var(--brand-text-secondary)]"
+            >
+              o continúa con
+            </div>
+          </div>
+
+          <button
+            id="google-login-btn"
+            type="button"
+            class="w-full bg-transparent border border-[var(--brand-border)] hover:bg-gray-800 text-white font-semibold py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2"
+          >
+            <svg class="w-5 h-5" viewBox="0 0 48 48">
+              <path
+                fill="#FFC107"
+                d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"
+              ></path>
+              <path
+                fill="#FF3D00"
+                d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"
+              ></path>
+              <path
+                fill="#4CAF50"
+                d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"
+              ></path>
+              <path
+                fill="#1976D2"
+                d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.574l6.19,5.238C42.021,35.591,44,30.138,44,24C44,22.659,43.862,21.35,43.611,20.083z"
+              ></path>
+            </svg>
+            <span>Google</span>
+          </button>
+        </div>
+
+        <a
+          href="https://www.growthbuddies.cl/"
+          class="mt-8 text-center text-sm text-[var(--brand-text-secondary)] hover:text-white transition-colors flex items-center justify-center gap-2"
+        >
+          <i data-lucide="arrow-left" class="w-4 h-4"></i>
+          <span>Volver a Growth Buddies</span>
+        </a>
+      </div>
     </div>
 
     <!-- Portal de la Aplicación (Oculto inicialmente) -->
     <div id="app-portal" class="hidden h-screen bg-[var(--brand-dark-bg)]">
-        <!-- Sidebar -->
-        <aside class="w-20 bg-[var(--brand-card-bg)] border-r border-[var(--brand-border)] text-[var(--brand-text-secondary)] flex flex-col items-center py-6 space-y-6 z-30">
-             <img src="img/logo.png" alt="Logo de Groddy's Lab" class="w-10 h-10">
-            <nav class="flex flex-col items-center space-y-4 flex-grow">
-                <button onclick="showModule('dashboard-kanban')" class="sidebar-icon active p-3 rounded-xl" data-tooltip="Dashboard"><i data-lucide="layout-dashboard"></i></button>
-                <button onclick="showModule('ai-agent')" class="sidebar-icon p-3 rounded-xl flex items-center justify-center" data-tooltip="Groddy AI"><span class="font-bold text-base">AI</span></button>
-                <button onclick="showModule('user-info')" class="sidebar-icon p-3 rounded-xl" data-tooltip="Mi Perfil"><i data-lucide="user-circle"></i></button>
-            </nav>
-            <div class="flex flex-col items-center space-y-4">
-                <button id="notifications-btn" onclick="toggleNotifications()" class="sidebar-icon p-3 rounded-xl relative" data-tooltip="Notificaciones"><i data-lucide="bell"></i><span id="notifications-indicator" class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full hidden"></span></button>
-                <div id="user-avatar" class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center font-bold text-lg text-white ring-2 ring-[var(--brand-turquoise)] cursor-pointer"></div>
-                <button onclick="logout()" class="sidebar-icon p-3 rounded-xl" data-tooltip="Cerrar Sesión"><i data-lucide="log-out" class="w-5 h-5"></i></button>
-            </div>
-        </aside>
-
-        <!-- Notification Panel -->
-        <div id="notifications-panel" class="fixed top-0 left-20 h-full w-80 bg-[var(--brand-card-bg)] border-r border-[var(--brand-border)] z-20 p-4 transform -translate-x-full"><div class="flex justify-between items-center mb-4"><h3 class="font-bold text-white">Notificaciones</h3><button onclick="toggleNotifications()" class="text-[var(--brand-text-secondary)] hover:text-white"><i data-lucide="x"></i></button></div><div id="notifications-list" class="space-y-3"></div></div>
-
-        <!-- Contenido Principal -->
-        <main class="flex-1 p-6 md:p-8 overflow-y-auto">
-            <header class="flex justify-between items-center mb-8">
-                 <div><h1 id="module-title" class="text-3xl font-bold text-white"></h1><p id="module-description" class="text-[var(--brand-text-secondary)]"></p></div>
-            </header>
-
-            <!-- Módulos -->
-            <div id="dashboard-kanban" class="module">
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                    <div class="lg:col-span-1 bg-[var(--brand-card-bg)] p-5 rounded-lg border border-[var(--brand-border)]"><h4 class="font-semibold text-[var(--brand-text-secondary)]">Horas Ahorradas (Mes Actual)</h4><p id="total-hours-saved" class="text-4xl font-bold mt-2 text-white">0h</p><p class="text-sm text-[var(--brand-turquoise)] flex items-center mt-1">Impacto total de tareas completadas.</p></div>
-                    <div class="lg:col-span-2 bg-[var(--brand-card-bg)] p-6 rounded-lg border border-[var(--brand-border)]"><h3 class="text-lg font-semibold text-white mb-4">Evolución de Horas Ahorradas</h3><div class="h-48"><canvas id="hoursChart"></canvas></div></div>
-                </div>
-                <div class="flex justify-end mb-4 editor-only">
-                    <button id="archive-tasks-btn" class="bg-blue-600 hover:bg-blue-500 text-white font-semibold px-4 py-2 rounded-lg text-sm flex items-center gap-2 transition-colors"><i data-lucide="archive" class="w-4 h-4"></i>Archivar Tareas Completadas</button>
-                </div>
-                <div id="kanban-board" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <div class="kanban-column" data-column-id="todo" ondragover="event.preventDefault()" ondrop="drop(event)"><div class="flex justify-between items-center mb-4"><h3 class="font-semibold text-white">To Do</h3><button onclick="openTaskDetails(null, 'todo')" class="editor-only text-[var(--brand-text-secondary)] hover:text-white"><i data-lucide="plus-circle" class="w-5 h-5"></i></button></div><div class="space-y-4"></div></div>
-                    <div class="kanban-column" data-column-id="inprogress" ondragover="event.preventDefault()" ondrop="drop(event)"><div class="flex justify-between items-center mb-4"><h3 class="font-semibold text-white">In Progress</h3></div><div class="space-y-4"></div></div>
-                    <div class="kanban-column" data-column-id="review" ondragover="event.preventDefault()" ondrop="drop(event)"><div class="flex justify-between items-center mb-4"><h3 class="font-semibold text-white">For Review</h3></div><div class="space-y-4"></div></div>
-                    <div class="kanban-column" data-column-id="done" ondragover="event.preventDefault()" ondrop="drop(event)"><div class="flex justify-between items-center mb-4"><h3 class="font-semibold text-white">Done</h3></div><div class="space-y-4"></div></div>
-                </div>
-                 <div class="mt-12"><h3 class="text-xl font-semibold text-white mb-4">Historial de Tareas Completadas</h3><div id="history-list" class="bg-[var(--brand-card-bg)] border border-[var(--brand-border)] rounded-lg p-4 max-h-80 overflow-y-auto space-y-3"><p class="text-center text-[var(--brand-text-secondary)]">Aún no hay tareas archivadas.</p></div></div>
-            </div>
-            <div id="ai-agent" class="module"><div class="max-w-3xl mx-auto"><div class="bg-[var(--brand-card-bg)] border border-[var(--brand-border)] rounded-lg shadow-lg"><div id="chat-messages" class="p-6 h-[32rem] overflow-y-auto space-y-4"></div><div class="p-4 border-t border-[var(--brand-border)]"><form id="ai-form" class="flex items-center gap-3"><input id="ai-input" type="text" placeholder="Describe una idea o un problema..." class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[var(--brand-turquoise)] transition text-sm"><button type="submit" class="bg-[var(--brand-turquoise)] text-[var(--brand-dark-bg)] px-4 py-2 rounded-lg font-semibold hover:opacity-90 transition">Enviar</button></form></div></div></div></div>
-            <div id="user-info" class="module"></div>
-        </main>
-    </div>
-    
-    <!-- Modals -->
-    <div id="task-detail-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden items-center justify-center z-50 p-4"><div class="bg-[var(--brand-card-bg)] p-6 rounded-lg border border-[var(--brand-border)] w-full max-w-2xl max-h-[90vh] flex flex-col"><div class="flex-shrink-0"><h2 id="modal-title" class="text-xl font-bold mb-6 text-white"></h2><form id="task-form" class="space-y-4"><input type="hidden" id="task-id"><input type="hidden" id="task-column"><div><label for="task-title" class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1">Título</label><input type="text" id="task-title" class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[var(--brand-turquoise)] transition text-sm" required></div><div><label for="task-description" class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1">Descripción</label><textarea id="task-description" rows="3" class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[var(--brand-turquoise)] transition text-sm"></textarea></div><div class="grid grid-cols-2 md:grid-cols-4 gap-4"><div><label for="task-priority" class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1">Prioridad</label><select id="task-priority" class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4"><option value="low">Baja</option><option value="medium">Media</option><option value="high">Alta</option></select></div><div><label for="task-impact" class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1">Ahorro Indiv.</label><input type="number" id="task-impact" placeholder="Horas" class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4"></div><div><label for="task-users-affected" class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1">Usuarios Afect.</label><input type="number" id="task-users-affected" placeholder="Cantidad" class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4"></div><div><label for="task-type" class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1">Recurrencia</label><select id="task-type" class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4"><option value="once">Único</option><option value="recurring">Recurrente</option></select></div></div></form></div><div class="flex-grow mt-6 pt-4 border-t border-[var(--brand-border)] overflow-y-auto"><h3 class="text-lg font-semibold text-white mb-3">Comentarios</h3><div id="comments-section" class="space-y-4"></div></div><div class="flex-shrink-0 mt-6 pt-4 border-t border-[var(--brand-border)]"><form id="comment-form" class="flex items-center gap-2"><input id="comment-input" type="text" placeholder="Escribe un comentario..." class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-3 text-sm"><button type="submit" class="px-4 py-2 rounded-lg text-sm font-semibold bg-[var(--brand-turquoise)] text-black">Enviar</button></form><div class="flex justify-end gap-3 mt-4"><button type="button" onclick="closeTaskDetails()" class="px-4 py-2 rounded-lg text-sm font-semibold bg-gray-600 hover:bg-gray-500 transition">Cerrar</button><button type="button" id="save-task-btn" class="px-4 py-2 rounded-lg text-sm font-semibold bg-[var(--brand-turquoise)] text-black hover:opacity-90 transition editor-only">Guardar Cambios</button></div></div></div></div>
-    <div id="user-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden items-center justify-center z-50 p-4">
-        <div class="bg-[var(--brand-card-bg)] p-6 rounded-lg border border-[var(--brand-border)] w-full max-w-md">
-            <h2 id="user-modal-title" class="text-xl font-bold mb-6 text-white"></h2>
-            <form id="user-form" class="space-y-4">
-                 <input type="hidden" id="user-id">
-                <div><label for="user-email" class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1">Correo Electrónico</label><input type="email" id="user-email" required class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4"></div>
-                <div><label for="user-name" class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1">Nombre Completo</label><input type="text" id="user-name" class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4"></div>
-                <div><label for="user-company" class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1">Empresa</label><input type="text" id="user-company" class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4"></div>
-                <div><label for="user-title" class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1">Cargo</label><input type="text" id="user-title" class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4"></div>
-                <div><label for="user-role" class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1">Rol</label><select id="user-role" class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4"><option value="Editor">Editor</option><option value="Visualizador">Visualizador</option><option value="Admin">Admin</option><option value="Inactivo">Inactivo</option></select></div>
-                <div class="mt-6 flex justify-end gap-3">
-                    <button type="button" onclick="closeUserModal()" class="px-4 py-2 rounded-lg text-sm font-semibold bg-gray-600 hover:bg-gray-500 transition">Cancelar</button>
-                    <button type="submit" class="px-4 py-2 rounded-lg text-sm font-semibold bg-[var(--brand-turquoise)] text-black hover:opacity-90 transition">Guardar Usuario</button>
-                </div>
-            </form>
+      <!-- Sidebar -->
+      <aside
+        class="w-20 bg-[var(--brand-card-bg)] border-r border-[var(--brand-border)] text-[var(--brand-text-secondary)] flex flex-col items-center py-6 space-y-6 z-30"
+      >
+        <img src="img/logo.png" alt="Logo de Groddy's Lab" class="w-10 h-10" />
+        <nav class="flex flex-col items-center space-y-4 flex-grow">
+          <button
+            onclick="showModule('dashboard-kanban')"
+            class="sidebar-icon active p-3 rounded-xl"
+            data-tooltip="Workspace"
+          >
+            <i data-lucide="layout-dashboard"></i>
+          </button>
+          <button
+            onclick="showModule('academy')"
+            class="sidebar-icon p-3 rounded-xl"
+            data-tooltip="Academy"
+          >
+            <i data-lucide="graduation-cap"></i>
+          </button>
+          <button
+            onclick="showModule('user-info')"
+            class="sidebar-icon p-3 rounded-xl"
+            data-tooltip="Mi Perfil"
+          >
+            <i data-lucide="user-circle"></i>
+          </button>
+        </nav>
+        <div class="flex flex-col items-center space-y-4">
+          <button
+            id="notifications-btn"
+            onclick="toggleNotifications()"
+            class="sidebar-icon p-3 rounded-xl relative"
+            data-tooltip="Notificaciones"
+          >
+            <i data-lucide="bell"></i
+            ><span
+              id="notifications-indicator"
+              class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full hidden"
+            ></span>
+          </button>
+          <div
+            id="user-avatar"
+            class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center font-bold text-lg text-white ring-2 ring-[var(--brand-turquoise)] cursor-pointer"
+          ></div>
+          <!-- Botón Gestionar Usuarios (Solo Superuser) -->
+          <button
+            id="admin-users-btn"
+            onclick="openUserAdminPanel()"
+            class="sidebar-icon p-3 rounded-xl admin-only hover:bg-yellow-500/20 text-yellow-400"
+            data-tooltip="Gestionar Usuarios"
+          >
+            <i data-lucide="users" class="w-5 h-5"></i>
+          </button>
+          <button
+            onclick="logout()"
+            class="sidebar-icon p-3 rounded-xl"
+            data-tooltip="Cerrar Sesión"
+          >
+            <i data-lucide="log-out" class="w-5 h-5"></i>
+          </button>
         </div>
+      </aside>
+
+      <!-- Notification Panel -->
+      <div
+        id="notifications-panel"
+        class="fixed top-0 left-20 h-full w-80 bg-[var(--brand-card-bg)] border-r border-[var(--brand-border)] z-20 p-4 transform -translate-x-full"
+      >
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="font-bold text-white">Notificaciones</h3>
+          <button
+            onclick="toggleNotifications()"
+            class="text-[var(--brand-text-secondary)] hover:text-white"
+          >
+            <i data-lucide="x"></i>
+          </button>
+        </div>
+        <div id="notifications-list" class="space-y-3"></div>
+      </div>
+
+      <!-- Contenido Principal -->
+      <main class="flex-1 p-6 md:p-8 overflow-y-auto">
+        <header
+          id="module-header"
+          class="mb-8 flex justify-between items-start"
+        >
+          <div>
+            <h2
+              id="module-title"
+              class="text-3xl font-bold bg-gradient-to-r from-white to-gray-400 text-transparent bg-clip-text"
+            >
+              Dashboard & Kanban
+            </h2>
+            <p
+              id="module-description"
+              class="text-[var(--brand-text-secondary)] mt-1"
+            ></p>
+          </div>
+          <div id="user-status-container"></div>
+        </header>
+
+        <!-- DASHBOARD (Visible para todos) -->
+        <div id="dashboard-kanban" class="module active">
+          <!-- Sección de Anuncios -->
+          <div id="announcements-container" class="mb-6 space-y-4"></div>
+
+          <!-- Métricas Principales -->
+          <div
+            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
+          >
+            <!-- Total Tareas -->
+            <div
+              class="bg-[var(--brand-card-bg)] p-5 rounded-lg border border-[var(--brand-border)] relative overflow-hidden group hover:border-[var(--brand-turquoise)] transition duration-300"
+            >
+              <div
+                class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition"
+              >
+                <i
+                  data-lucide="layers"
+                  class="w-16 h-16 text-[var(--brand-turquoise)]"
+                ></i>
+              </div>
+              <h4
+                class="font-semibold text-[var(--brand-text-secondary)] text-sm uppercase tracking-wider"
+              >
+                Tareas Activas
+              </h4>
+              <p
+                id="metric-active-tasks"
+                class="text-3xl font-bold mt-2 text-white"
+              >
+                0
+              </p>
+              <p class="text-xs text-gray-500 mt-1">En curso o revisión</p>
+            </div>
+
+            <!-- Completadas Mes -->
+            <div
+              class="bg-[var(--brand-card-bg)] p-5 rounded-lg border border-[var(--brand-border)] relative overflow-hidden group hover:border-green-500 transition duration-300"
+            >
+              <div
+                class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition"
+              >
+                <i
+                  data-lucide="check-circle"
+                  class="w-16 h-16 text-green-500"
+                ></i>
+              </div>
+              <h4
+                class="font-semibold text-[var(--brand-text-secondary)] text-sm uppercase tracking-wider"
+              >
+                Completadas
+              </h4>
+              <p
+                id="metric-completed-month"
+                class="text-3xl font-bold mt-2 text-white"
+              >
+                0
+              </p>
+              <p class="text-xs text-gray-500 mt-1">Este mes</p>
+            </div>
+
+            <!-- Horas Ahorradas -->
+            <div
+              class="bg-[var(--brand-card-bg)] p-5 rounded-lg border border-[var(--brand-border)] relative overflow-hidden group hover:border-yellow-500 transition duration-300"
+            >
+              <div
+                class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition"
+              >
+                <i data-lucide="zap" class="w-16 h-16 text-yellow-500"></i>
+              </div>
+              <h4
+                class="font-semibold text-[var(--brand-text-secondary)] text-sm uppercase tracking-wider"
+              >
+                Horas Ahorradas
+              </h4>
+              <p
+                id="total-hours-saved"
+                class="text-3xl font-bold mt-2 text-white"
+              >
+                0h
+              </p>
+              <p
+                class="text-xs text-[var(--brand-turquoise)] mt-1 flex items-center gap-1"
+              >
+                <i data-lucide="trending-up" class="w-3 h-3"></i> Impacto
+                Directo
+              </p>
+            </div>
+
+            <!-- Eficiencia -->
+            <div
+              class="bg-[var(--brand-card-bg)] p-5 rounded-lg border border-[var(--brand-border)] relative overflow-hidden group hover:border-purple-500 transition duration-300"
+            >
+              <div
+                class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition"
+              >
+                <i data-lucide="activity" class="w-16 h-16 text-purple-500"></i>
+              </div>
+              <h4
+                class="font-semibold text-[var(--brand-text-secondary)] text-sm uppercase tracking-wider"
+              >
+                Eficiencia
+              </h4>
+              <p
+                id="metric-efficiency"
+                class="text-3xl font-bold mt-2 text-white"
+              >
+                0x
+              </p>
+              <p class="text-xs text-gray-500 mt-1">Ahorro vs Real</p>
+            </div>
+          </div>
+
+          <div class="flex justify-end mb-4 editor-only">
+            <button
+              id="archive-tasks-btn"
+              class="bg-blue-600 hover:bg-blue-500 text-white font-semibold px-4 py-2 rounded-lg text-sm flex items-center gap-2 transition-colors"
+            >
+              <i data-lucide="archive" class="w-4 h-4"></i>Archivar Tareas
+              Completadas
+            </button>
+          </div>
+          <div
+            id="kanban-board"
+            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+          >
+            <div
+              class="kanban-column"
+              data-column-id="todo"
+              ondragover="event.preventDefault()"
+              ondrop="drop(event)"
+            >
+              <div class="flex justify-between items-center mb-4">
+                <h3 class="font-semibold text-white">To Do</h3>
+                <button
+                  onclick="openTaskDetails(null, 'todo')"
+                  class="text-[var(--brand-text-secondary)] hover:text-white"
+                >
+                  <i data-lucide="plus-circle" class="w-5 h-5"></i>
+                </button>
+              </div>
+              <div
+                class="space-y-4 min-h-[200px] border border-dashed border-gray-800 rounded-lg p-2"
+              ></div>
+            </div>
+            <div
+              class="kanban-column"
+              data-column-id="inprogress"
+              ondragover="event.preventDefault()"
+              ondrop="drop(event)"
+            >
+              <div class="flex justify-between items-center mb-4">
+                <h3 class="font-semibold text-white">In Progress</h3>
+              </div>
+              <div
+                class="space-y-4 min-h-[200px] border border-dashed border-gray-800 rounded-lg p-2"
+              ></div>
+            </div>
+            <div
+              class="kanban-column"
+              data-column-id="review"
+              ondragover="event.preventDefault()"
+              ondrop="drop(event)"
+            >
+              <div class="flex justify-between items-center mb-4">
+                <h3 class="font-semibold text-white">For Review</h3>
+              </div>
+              <div
+                class="space-y-4 min-h-[200px] border border-dashed border-gray-800 rounded-lg p-2"
+              ></div>
+            </div>
+            <div
+              class="kanban-column"
+              data-column-id="done"
+              ondragover="event.preventDefault()"
+              ondrop="drop(event)"
+            >
+              <div class="flex justify-between items-center mb-4">
+                <h3 class="font-semibold text-white">Done</h3>
+              </div>
+              <div
+                class="space-y-4 min-h-[200px] border border-dashed border-gray-800 rounded-lg p-2"
+              ></div>
+            </div>
+          </div>
+          <div class="mt-12">
+            <h3 class="text-xl font-semibold text-white mb-4">
+              Historial de Tareas Completadas
+            </h3>
+            <div
+              id="history-list"
+              class="bg-[var(--brand-card-bg)] border border-[var(--brand-border)] rounded-lg p-4 max-h-80 overflow-y-auto space-y-3"
+            >
+              <p class="text-center text-[var(--brand-text-secondary)]">
+                Aún no hay tareas archivadas.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Módulo Academy -->
+        <div id="academy" class="module">
+          <!-- Banner Upgrade para Freemium -->
+          <div
+            class="freemium-only bg-gradient-to-r from-purple-600 to-blue-600 p-4 rounded-lg mb-6"
+          >
+            <div
+              class="flex flex-col md:flex-row items-center justify-between gap-4"
+            >
+              <div>
+                <h3 class="font-bold text-white text-lg">
+                  ¡Desbloquea todo el potencial!
+                </h3>
+                <p class="text-sm text-white/80">
+                  Conviértete en cliente premium y accede al Workspace completo
+                  con Kanban, Knowledge Base y Groddy AI Pro.
+                </p>
+              </div>
+              <a
+                href="https://calendly.com/espohr/conversemos"
+                target="_blank"
+                class="bg-white text-purple-600 px-6 py-2 rounded-lg font-semibold hover:bg-gray-100 transition whitespace-nowrap"
+              >
+                Agendar Sesión
+              </a>
+            </div>
+          </div>
+
+          <div id="academy-catalog">
+            <!-- Cursos -->
+            <div class="mb-8">
+              <h3
+                class="text-xl font-bold text-white mb-6 flex items-center gap-2"
+              >
+                <i
+                  data-lucide="graduation-cap"
+                  class="w-5 h-5 text-[var(--brand-turquoise)]"
+                ></i>
+                Cursos Disponibles
+              </h3>
+              <div
+                id="courses-grid"
+                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+              >
+                <!-- Cursos se cargarán dinámicamente aquí -->
+                <div class="col-span-full text-center py-12">
+                  <i
+                    data-lucide="loader"
+                    class="animate-spin w-8 h-8 text-[var(--brand-turquoise)] mx-auto mb-2"
+                  ></i>
+                  <p class="text-[var(--brand-text-secondary)]">
+                    Cargando cursos...
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Recursos -->
+            <div>
+              <h3
+                class="text-xl font-bold text-white mb-6 flex items-center gap-2"
+              >
+                <i
+                  data-lucide="folder-open"
+                  class="w-5 h-5 text-[var(--brand-turquoise)]"
+                ></i>
+                Biblioteca de Recursos
+              </h3>
+              <div
+                id="resources-list"
+                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+              >
+                <a
+                  href="#"
+                  class="block bg-[var(--brand-card-bg)] border border-[var(--brand-border)] p-4 rounded-lg flex items-center justify-between hover:border-[var(--brand-turquoise)] transition cursor-pointer group"
+                >
+                  <div class="flex items-center gap-3">
+                    <div
+                      class="w-12 h-12 rounded-lg bg-blue-900/30 flex items-center justify-center text-blue-400"
+                    >
+                      <i data-lucide="file-text" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                      <h4
+                        class="font-semibold text-white text-sm group-hover:text-[var(--brand-turquoise)] transition"
+                      >
+                        Plantilla de Procesos
+                      </h4>
+                      <p class="text-xs text-[var(--brand-text-secondary)]">
+                        PDF • 2.5 MB
+                      </p>
+                    </div>
+                  </div>
+                  <i
+                    data-lucide="download"
+                    class="w-5 h-5 text-[var(--brand-text-secondary)] group-hover:text-white transition"
+                  ></i>
+                </a>
+                <a
+                  href="#"
+                  class="block bg-[var(--brand-card-bg)] border border-[var(--brand-border)] p-4 rounded-lg flex items-center justify-between hover:border-[var(--brand-turquoise)] transition cursor-pointer group"
+                >
+                  <div class="flex items-center gap-3">
+                    <div
+                      class="w-12 h-12 rounded-lg bg-green-900/30 flex items-center justify-center text-green-400"
+                    >
+                      <i data-lucide="table" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                      <h4
+                        class="font-semibold text-white text-sm group-hover:text-[var(--brand-turquoise)] transition"
+                      >
+                        Calculadora ROI
+                      </h4>
+                      <p class="text-xs text-[var(--brand-text-secondary)]">
+                        XLSX • 1.2 MB
+                      </p>
+                    </div>
+                  </div>
+                  <i
+                    data-lucide="download"
+                    class="w-5 h-5 text-[var(--brand-text-secondary)] group-hover:text-white transition"
+                  ></i>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Visor de Curso / Lección -->
+          <div id="academy-viewer" class="hidden">
+            <button
+              onclick="closeCourseViewer()"
+              class="mb-4 flex items-center text-sm text-[var(--brand-turquoise)] hover:underline"
+            >
+              <i data-lucide="arrow-left" class="w-4 h-4 mr-1"></i> Volver al
+              Catálogo
+            </button>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <!-- Contenido Principal -->
+              <div class="lg:col-span-2">
+                <div
+                  id="lesson-player"
+                  class="bg-[var(--brand-card-bg)] border border-[var(--brand-border)] rounded-lg overflow-hidden min-h-[400px]"
+                >
+                  <div
+                    class="p-8 flex items-center justify-center h-full text-[var(--brand-text-secondary)]"
+                  >
+                    Selecciona una lección para comenzar
+                  </div>
+                </div>
+                <div class="mt-4">
+                  <h2
+                    id="lesson-title"
+                    class="text-2xl font-bold text-white mb-2"
+                  ></h2>
+                  <div
+                    id="lesson-description"
+                    class="prose prose-invert text-sm text-[var(--brand-text-secondary)]"
+                  ></div>
+                </div>
+              </div>
+
+              <!-- Lista de Lecciones -->
+              <div class="lg:col-span-1">
+                <div
+                  class="bg-[var(--brand-card-bg)] border border-[var(--brand-border)] rounded-lg overflow-hidden"
+                >
+                  <div
+                    class="p-4 border-b border-[var(--brand-border)] bg-gray-900/50"
+                  >
+                    <h3 id="course-title" class="font-bold text-white">
+                      Contenido del Curso
+                    </h3>
+                    <div class="w-full bg-gray-700 h-1.5 rounded-full mt-2">
+                      <div
+                        id="course-progress-bar"
+                        class="bg-[var(--brand-turquoise)] h-1.5 rounded-full"
+                        style="width: 0%"
+                      ></div>
+                    </div>
+                    <p class="text-xs text-right text-gray-400 mt-1">
+                      0% completado
+                    </p>
+                  </div>
+                  <div id="lessons-list" class="max-h-[500px] overflow-y-auto">
+                    <!-- JS Injected -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="user-info" class="module"></div>
+      </main>
+    </div>
+
+    <!-- Modals -->
+    <div
+      id="task-detail-modal"
+      class="fixed inset-0 bg-black bg-opacity-70 hidden items-center justify-center z-50 p-4"
+    >
+      <div
+        class="bg-[var(--brand-card-bg)] p-6 rounded-lg border border-[var(--brand-border)] w-full max-w-2xl max-h-[90vh] flex flex-col"
+      >
+        <div class="flex-shrink-0">
+          <h2 id="modal-title" class="text-xl font-bold mb-6 text-white"></h2>
+          <form id="task-form" class="space-y-4">
+            <input type="hidden" id="task-id" /><input
+              type="hidden"
+              id="task-column"
+            />
+            <div>
+              <label
+                for="task-title"
+                class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1"
+                >Título</label
+              ><input
+                type="text"
+                id="task-title"
+                class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[var(--brand-turquoise)] transition text-sm"
+                required
+              />
+            </div>
+            <div>
+              <label
+                for="task-description"
+                class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1"
+                >Descripción</label
+              ><textarea
+                id="task-description"
+                rows="3"
+                class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[var(--brand-turquoise)] transition text-sm"
+              ></textarea>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label
+                  for="task-project"
+                  class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1"
+                  >Proyecto / Área</label
+                >
+                <select
+                  id="task-project"
+                  class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4 focus:ring-2 focus:ring-[var(--brand-turquoise)] focus:outline-none transition text-sm"
+                >
+                  <option value="General">General</option>
+                  <option value="Operations">Operaciones</option>
+                  <option value="Marketing">Marketing</option>
+                  <option value="Sales">Ventas</option>
+                  <option value="Development">Desarrollo</option>
+                  <option value="HR">Recursos Humanos</option>
+                </select>
+              </div>
+              <div>
+                <label
+                  for="task-priority"
+                  class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1"
+                  >Prioridad</label
+                >
+                <select
+                  id="task-priority"
+                  class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4 focus:ring-2 focus:ring-[var(--brand-turquoise)] focus:outline-none transition text-sm"
+                >
+                  <option value="low">Baja</option>
+                  <option value="medium" selected>Media</option>
+                  <option value="high">Alta</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Asignación (Solo visible si hay empresa) -->
+            <div id="task-assignment-container" class="hidden">
+              <label
+                for="task-assigned-to"
+                class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1"
+                >Asignar a</label
+              >
+              <select
+                id="task-assigned-to"
+                class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4 focus:ring-2 focus:ring-[var(--brand-turquoise)] focus:outline-none transition text-sm"
+              >
+                <option value="">Sin asignar</option>
+              </select>
+            </div>
+
+            <!-- AI Section -->
+            <div
+              class="bg-[var(--brand-dark-bg)] border border-[var(--brand-border)] rounded-lg p-3"
+            >
+              <div class="flex items-center justify-between mb-3">
+                <span
+                  class="text-xs font-bold text-[var(--brand-turquoise)] uppercase tracking-wider flex items-center gap-1"
+                >
+                  <i data-lucide="sparkles" class="w-3 h-3"></i> Groddy AI
+                  Optimization
+                </span>
+                <button
+                  type="button"
+                  id="magic-estimate-btn"
+                  class="text-xs bg-[var(--brand-turquoise)] text-black px-3 py-1 rounded-md font-bold hover:opacity-90 transition flex items-center gap-1"
+                >
+                  <i data-lucide="zap" class="w-3 h-3"></i> Auto-Estimar
+                </button>
+              </div>
+
+              <div class="grid grid-cols-3 gap-3 mb-3">
+                <div>
+                  <label
+                    for="task-estimated"
+                    class="block text-xs text-[var(--brand-text-secondary)] mb-1"
+                    >Estimado (h)</label
+                  >
+                  <input
+                    type="number"
+                    id="task-estimated"
+                    step="0.5"
+                    class="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1 text-sm focus:border-[var(--brand-turquoise)] focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label
+                    for="task-savings"
+                    class="block text-xs text-[var(--brand-text-secondary)] mb-1"
+                    >Ahorro Potencial (h)</label
+                  >
+                  <input
+                    type="number"
+                    id="task-savings"
+                    step="0.5"
+                    readonly
+                    class="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1 text-sm text-green-400"
+                  />
+                </div>
+                <div>
+                  <label
+                    for="task-actual"
+                    class="block text-xs text-[var(--brand-text-secondary)] mb-1"
+                    >Real (h)</label
+                  >
+                  <input
+                    type="number"
+                    id="task-actual"
+                    step="0.5"
+                    class="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1 text-sm focus:border-[var(--brand-turquoise)] focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label
+                  for="task-ai-analysis"
+                  class="block text-xs text-[var(--brand-text-secondary)] mb-1"
+                  >Análisis de Eficiencia</label
+                >
+                <textarea
+                  id="task-ai-analysis"
+                  rows="2"
+                  readonly
+                  class="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1 text-xs italic text-gray-400 resize-none"
+                ></textarea>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div
+          class="flex-grow mt-6 pt-4 border-t border-[var(--brand-border)] overflow-y-auto"
+        >
+          <h3 class="text-lg font-semibold text-white mb-3">Comentarios</h3>
+          <div id="comments-section" class="space-y-4"></div>
+        </div>
+        <div
+          class="flex-shrink-0 mt-6 pt-4 border-t border-[var(--brand-border)]"
+        >
+          <form id="comment-form" class="flex items-center gap-2">
+            <input
+              id="comment-input"
+              type="text"
+              placeholder="Escribe un comentario..."
+              class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-3 text-sm"
+            /><button
+              type="submit"
+              class="px-4 py-2 rounded-lg text-sm font-semibold bg-[var(--brand-turquoise)] text-black"
+            >
+              Enviar
+            </button>
+          </form>
+          <div class="flex justify-end gap-3 mt-4">
+            <button
+              type="button"
+              onclick="closeTaskDetails()"
+              class="px-4 py-2 rounded-lg text-sm font-semibold bg-gray-600 hover:bg-gray-500 transition"
+            >
+              Cerrar</button
+            ><button
+              type="button"
+              id="save-task-btn"
+              class="px-4 py-2 rounded-lg text-sm font-semibold bg-[var(--brand-turquoise)] text-black hover:opacity-90 transition editor-only"
+            >
+              Guardar Cambios
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      id="user-modal"
+      class="fixed inset-0 bg-black bg-opacity-70 hidden items-center justify-center z-50 p-4"
+    >
+      <div
+        class="bg-[var(--brand-card-bg)] p-6 rounded-lg border border-[var(--brand-border)] w-full max-w-md"
+      >
+        <h2
+          id="user-modal-title"
+          class="text-xl font-bold mb-6 text-white"
+        ></h2>
+        <form id="user-form" class="space-y-4">
+          <input type="hidden" id="user-id" />
+          <div>
+            <label
+              for="user-email"
+              class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1"
+              >Correo Electrónico</label
+            ><input
+              type="email"
+              id="user-email"
+              required
+              class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4"
+            />
+          </div>
+          <div>
+            <label
+              for="user-name"
+              class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1"
+              >Nombre Completo</label
+            ><input
+              type="text"
+              id="user-name"
+              class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4"
+            />
+          </div>
+          <div>
+            <label
+              for="user-company"
+              class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1"
+              >Empresa</label
+            ><input
+              type="text"
+              id="user-company"
+              class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4"
+            />
+          </div>
+          <div>
+            <label
+              for="user-title"
+              class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1"
+              >Cargo</label
+            ><input
+              type="text"
+              id="user-title"
+              class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4"
+            />
+          </div>
+          <div>
+            <label
+              for="user-role"
+              class="block text-sm font-medium text-[var(--brand-text-secondary)] mb-1"
+              >Rol</label
+            ><select
+              id="user-role"
+              class="w-full bg-gray-800 border border-[var(--brand-border)] rounded-lg py-2 px-4"
+            >
+              <option value="Editor">Editor</option>
+              <option value="Visualizador">Visualizador</option>
+              <option value="Admin">Admin</option>
+              <option value="Inactivo">Inactivo</option>
+            </select>
+          </div>
+          <div class="mt-6 flex justify-end gap-3">
+            <button
+              type="button"
+              onclick="closeUserModal()"
+              class="px-4 py-2 rounded-lg text-sm font-semibold bg-gray-600 hover:bg-gray-500 transition"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              class="px-4 py-2 rounded-lg text-sm font-semibold bg-[var(--brand-turquoise)] text-black hover:opacity-90 transition"
+            >
+              Guardar Usuario
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <!-- Modal Administración de Usuarios (Superuser) -->
+    <div
+      id="user-admin-modal"
+      class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center"
+    >
+      <div
+        class="bg-[var(--brand-card-bg)] border border-[var(--brand-border)] rounded-xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl"
+      >
+        <!-- Header -->
+        <div
+          class="flex justify-between items-center p-6 border-b border-[var(--brand-border)] bg-gradient-to-r from-yellow-900/30 to-amber-900/30"
+        >
+          <div class="flex items-center gap-3">
+            <div
+              class="w-10 h-10 rounded-full bg-gradient-to-br from-yellow-500 to-amber-600 flex items-center justify-center"
+            >
+              <i data-lucide="users" class="w-5 h-5 text-black"></i>
+            </div>
+            <div>
+              <h2 class="text-xl font-bold text-white">Gestionar Usuarios</h2>
+              <p class="text-xs text-gray-400">
+                Panel de administración - Superuser
+              </p>
+            </div>
+          </div>
+          <button
+            onclick="closeUserAdminPanel()"
+            class="text-gray-400 hover:text-white p-2 rounded-lg hover:bg-white/10 transition"
+          >
+            <i data-lucide="x" class="w-6 h-6"></i>
+          </button>
+        </div>
+        <!-- Content -->
+        <div class="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+          <!-- Tabla de Usuarios -->
+          <div id="users-table-container" class="mb-6">
+            <div class="flex items-center justify-center py-12 text-gray-400">
+              <i data-lucide="loader-2" class="w-6 h-6 animate-spin mr-2"></i>
+              Cargando usuarios...
+            </div>
+          </div>
+          <!-- Formulario de Edición (oculto por defecto) -->
+          <div
+            id="user-edit-form"
+            class="hidden bg-black/30 rounded-xl p-6 border border-[var(--brand-border)]"
+          >
+            <h3
+              class="text-lg font-bold text-white mb-4 flex items-center gap-2"
+            >
+              <i data-lucide="user-pen" class="w-4 h-4 text-yellow-400"></i>
+              Editar Usuario
+            </h3>
+            <input type="hidden" id="edit-user-uid" />
+            <div class="grid grid-cols-2 gap-4 mb-4">
+              <div>
+                <label class="block text-xs text-gray-400 uppercase mb-1"
+                  >Email</label
+                >
+                <input
+                  type="email"
+                  id="edit-user-email"
+                  readonly
+                  class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm cursor-not-allowed opacity-60"
+                />
+              </div>
+              <div>
+                <label class="block text-xs text-gray-400 uppercase mb-1"
+                  >Rol</label
+                >
+                <select
+                  id="edit-user-role"
+                  class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm"
+                >
+                  <option value="Free">Free</option>
+                  <option value="Pro">Pro</option>
+                  <option value="Admin">Admin</option>
+                  <option value="Superuser">Superuser</option>
+                </select>
+              </div>
+              <div class="col-span-2">
+                <label class="block text-xs text-gray-400 uppercase mb-1"
+                  >ID Empresa (dejar vacío para Free)</label
+                >
+                <input
+                  type="text"
+                  id="edit-user-company"
+                  placeholder="ej: acme-corp"
+                  class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm"
+                />
+              </div>
+            </div>
+            <div class="flex justify-end gap-2">
+              <button
+                onclick="cancelEditUser()"
+                class="px-4 py-2 rounded-lg text-sm font-semibold bg-gray-700 text-gray-300 hover:bg-gray-600 transition"
+              >
+                Cancelar
+              </button>
+              <button
+                onclick="saveUserRole()"
+                class="px-4 py-2 rounded-lg text-sm font-semibold bg-gradient-to-r from-yellow-500 to-amber-600 text-black hover:opacity-90 transition"
+              >
+                Guardar Cambios
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
     <script type="module" src="app.js"></script>
-</body>
+  </body>
 </html>
