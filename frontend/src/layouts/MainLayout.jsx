@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { LucideLayoutDashboard, LucideLogOut, LucideUserCircle, LucideGraduationCap, LucideBell, LucideUsers, LucideShield } from 'lucide-react';
+import { LucideLayoutDashboard, LucideLogOut, LucideUserCircle, LucideGraduationCap, LucideBell, LucideUsers, LucideShield, BookOpen } from 'lucide-react';
 import { useNavigate, Outlet, Link } from 'react-router-dom';
 
 export default function MainLayout({ children }) {
@@ -32,6 +32,7 @@ export default function MainLayout({ children }) {
 
           <ul className="flex flex-col items-center gap-4">
             <SidebarItem icon={<LucideLayoutDashboard size={20} />} text="Dashboard" to="/" active={location.pathname === '/'} />
+            <SidebarItem icon={<BookOpen size={20} />} text="Bitácora" to="/bitacora" active={location.pathname === '/bitacora'} />
             <SidebarItem icon={<LucideGraduationCap size={20} />} text="Academy" to="/academy" active={location.pathname === '/academy'} />
             <SidebarItem icon={<LucideUserCircle size={20} />} text="Mi Perfil" to="/profile" active={location.pathname === '/profile'} />
             

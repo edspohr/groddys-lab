@@ -1,44 +1,56 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { db } from '../firebase-config';
-import { collection, query, onSnapshot } from 'firebase/firestore';
+import { collection, query, onSnapshot, collectionGroup } from 'firebase/firestore';
 import KanbanBoard from '../components/KanbanBoard';
 import TicketForm from '../components/TicketForm';
 import TaskDetailModal from '../components/TaskDetailModal';
 import DashboardMetrics from '../components/DashboardMetrics';
 import ProfileModal from '../components/ProfileModal';
+import CompanySelector from '../components/CompanySelector';
 import { Layers, CheckCircle, Zap, Plus, User, FileText } from 'lucide-react';
 import { generateMonthlyReport } from '../utils/generateMonthlyReport';
 
 export default function Dashboard() {
-  const { currentUser, userTier, userCompanyId } = useAuth();
+  const { currentUser, userCompanyId, userRole } = useAuth();
   const [isTicketFormOpen, setIsTicketFormOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
-  const [tasks, setTasks] = useState([]); // Raw tasks for charts
-  const [metrics, setMetrics] = useState({
-    active: 0,
-    completed: 0,
-    saved: 0
-  });
+  const [tasks, setTasks] = useState([]);
+  const [metrics, setMetrics] = useState({ active: 0, completed: 0, saved: 0 });
   const [loading, setLoading] = useState(true);
+
+  // Company Filter State (for Superusers)
+  const isSuperuser = userRole === 'Superuser' || userRole === 'Admin';
+  const [selectedCompanyId, setSelectedCompanyId] = useState(null); // null = All Companies
+
+  // Effective company ID: for clients, always their own company; for superusers, selected or null (all)
+  const effectiveCompanyId = isSuperuser ? selectedCompanyId : userCompanyId;
 
   useEffect(() => {
     if (!currentUser) return;
 
     let q;
-    if (userTier === 'premium' && userCompanyId) {
-      q = query(collection(db, "companies", userCompanyId, "tasks"));
+    
+    if (isSuperuser && !effectiveCompanyId) {
+      // Superuser viewing ALL companies: use collectionGroup
+      q = collectionGroup(db, "tasks");
+    } else if (effectiveCompanyId) {
+      // Specific company (superuser filter OR client's company)
+      q = query(collection(db, "companies", effectiveCompanyId, "tasks"));
     } else {
+      // Freemium user with personal tasks
       q = query(collection(db, "users", currentUser.uid, "tasks"));
     }
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const fetchedTasks = snapshot.docs.map(doc => doc.data());
+      const fetchedTasks = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
       
       const active = fetchedTasks.filter(t => ['todo', 'inprogress', 'review'].includes(t.columnId)).length;
       const completed = fetchedTasks.filter(t => t.columnId === 'done').length;
-      
       const completedTasks = fetchedTasks.filter(t => t.columnId === 'done');
       const saved = completedTasks.reduce((acc, t) => acc + (parseFloat(t.savingsHours) || 0), 0);
       
@@ -51,7 +63,7 @@ export default function Dashboard() {
     });
 
     return () => unsubscribe();
-  }, [currentUser, userTier, userCompanyId]);
+  }, [currentUser, effectiveCompanyId, isSuperuser]);
 
   return (
     <div>
@@ -64,15 +76,25 @@ export default function Dashboard() {
                 Métricas clave y gestión del flujo de trabajo.
                 </p>
             </div>
-            <div className="flex gap-3">
-                <button 
-                    onClick={() => generateMonthlyReport(tasks, metrics, "Mi Empresa", currentUser)}
-                    className="glass-card px-4 py-2 rounded-lg font-semibold text-white hover:bg-white/5 transition flex items-center gap-2"
-                    title="Descargar Reporte Mensual (PDF)"
-                >
-                    <FileText size={20} className="text-blue-400" />
-                    <span className="hidden lg:inline">Reporte</span>
-                </button>
+            <div className="flex gap-3 flex-wrap">
+                {/* Company Selector (Superusers Only) */}
+                {isSuperuser && (
+                    <CompanySelector 
+                        value={selectedCompanyId} 
+                        onChange={setSelectedCompanyId} 
+                    />
+                )}
+                {/* Report Button (Superusers Only) */}
+                {isSuperuser && (
+                    <button 
+                        onClick={() => generateMonthlyReport(tasks, metrics, effectiveCompanyId || "Todas", currentUser)}
+                        className="glass-card px-4 py-2 rounded-lg font-semibold text-white hover:bg-white/5 transition flex items-center gap-2"
+                        title="Descargar Reporte Mensual (PDF)"
+                    >
+                        <FileText size={20} className="text-blue-400" />
+                        <span className="hidden lg:inline">Reporte</span>
+                    </button>
+                )}
                 <button 
                     onClick={() => setIsProfileOpen(true)}
                     className="glass-card px-4 py-2 rounded-lg font-semibold text-white hover:bg-white/5 transition flex items-center gap-2"
@@ -119,9 +141,12 @@ export default function Dashboard() {
         {/* Detailed Metrics Charts (Hours & Strategy) */}
         {!loading && <DashboardMetrics tasks={tasks} />}
 
-        {/* Kanban Board */}
+        {/* Kanban Board - Pass filter */}
         <div className="animate-fade-in">
-             <KanbanBoard onTaskClick={setSelectedTask} />
+             <KanbanBoard 
+                 onTaskClick={setSelectedTask} 
+                 companyIdFilter={effectiveCompanyId}
+             />
         </div>
 
         {/* Global Modals */}
@@ -129,6 +154,7 @@ export default function Dashboard() {
             isOpen={isTicketFormOpen} 
             onClose={() => setIsTicketFormOpen(false)} 
             onSuccess={() => {}}
+            companyIdOverride={effectiveCompanyId}
         />
         
         <TaskDetailModal 

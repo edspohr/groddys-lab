@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { db, app } from '../../firebase-config'; // Need app for secondary auth
-import { collection, onSnapshot, setDoc, doc, serverTimestamp, getDocs } from 'firebase/firestore';
+import { collection, onSnapshot, setDoc, doc, serverTimestamp } from 'firebase/firestore';
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth'; // Modular SDK
 import { initializeApp } from "firebase/app"; // To create secondary instance
 import { Users, Plus, Loader2, UserCheck } from 'lucide-react';
@@ -61,6 +61,11 @@ export default function UserList() {
        </div>
 
        <div className="bg-brand-card border border-brand-border rounded-lg overflow-hidden">
+        {loading ? (
+             <div className="flex justify-center p-8">
+                <Loader2 className="animate-spin text-brand-turquoise" size={32} />
+             </div>
+        ) : (
             <table className="w-full text-left border-collapse">
                 <thead>
                     <tr className="bg-brand-dark text-brand-text-secondary text-sm uppercase">
@@ -92,6 +97,7 @@ export default function UserList() {
                     })}
                 </tbody>
             </table>
+        )}
        </div>
 
        <AddUserModal 

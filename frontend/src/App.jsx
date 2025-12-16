@@ -7,6 +7,7 @@ import AdminDashboard from './pages/Admin/AdminDashboard';
 import CompanyList from './pages/Admin/CompanyList';
 import UserList from './pages/Admin/UserList';
 import Meetings from './pages/Meetings';
+import Bitacora from './pages/Bitacora';
 import Academy from './pages/Academy';
 import Profile from './pages/Profile';
 
@@ -67,6 +68,15 @@ export default function App() {
             <ProtectedRoute>
               <MainLayout>
                 <Meetings />
+              </MainLayout>
+            </ProtectedRoute>
+          } />
+
+          {/* Bitácora Route */}
+          <Route path="/bitacora" element={
+            <ProtectedRoute>
+              <MainLayout>
+                <Bitacora />
               </MainLayout>
             </ProtectedRoute>
           } />

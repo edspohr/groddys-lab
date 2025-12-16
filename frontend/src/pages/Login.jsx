@@ -106,7 +106,9 @@ export default function Login() {
       <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] bg-brand-turquoise/20 rounded-full blur-[120px] pointer-events-none animate-pulse"></div>
       <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] bg-brand-purple/20 rounded-full blur-[100px] pointer-events-none"></div>
 
-      <div className="glass-card w-full max-w-md p-8 md:p-10 rounded-2xl shadow-2xl relative z-10 border-white/10 flex flex-col items-center">
+      {/* Centered Content Wrapper */}
+      <div className="relative z-10 flex flex-col items-center">
+        <div className="glass-card w-full max-w-md p-8 md:p-10 rounded-2xl shadow-2xl border-white/10 flex flex-col items-center">
         
         <div className="mb-8 text-center animate-fade-in">
            <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4 ring-1 ring-white/20 backdrop-blur-md">
@@ -128,7 +130,7 @@ export default function Login() {
                     </div>
                     
                     <div className="space-y-1">
-                        <label className="text-xs font-bold text-brand-text-secondary uppercase tracking-wider ml-1">Email</label>
+                        <label className="text-xs font-bold text-gray-300 uppercase tracking-wider ml-1">Email</label>
                         <input 
                             type="email" 
                             placeholder="ejemplo@empresa.com" 
@@ -160,7 +162,7 @@ export default function Login() {
                 <form onSubmit={handleSubmit} className="space-y-4">
                     {isLogin === false && ( // Only show name field for registration
                         <div className="space-y-1">
-                            <label className="text-xs font-bold text-brand-text-secondary uppercase tracking-wider ml-1">Nombre Completo</label>
+                            <label className="text-xs font-bold text-gray-300 uppercase tracking-wider ml-1">Nombre Completo</label>
                             <input 
                                 type="text" 
                                 placeholder="Ej: Juan Pérez" 
@@ -172,7 +174,7 @@ export default function Login() {
                         </div>
                     )}
                     <div className="space-y-1">
-                        <label className="text-xs font-bold text-brand-text-secondary uppercase tracking-wider ml-1">Email</label>
+                        <label className="text-xs font-bold text-gray-300 uppercase tracking-wider ml-1">Email</label>
                         <input 
                             type="email" 
                             placeholder="ejemplo@empresa.com" 
@@ -184,7 +186,7 @@ export default function Login() {
                     </div>
                     
                     <div className="space-y-1">
-                        <label className="text-xs font-bold text-brand-text-secondary uppercase tracking-wider ml-1">Contraseña</label>
+                        <label className="text-xs font-bold text-gray-300 uppercase tracking-wider ml-1">Contraseña</label>
                         <input 
                             type="password" 
                             placeholder="••••••••" 
@@ -193,21 +195,22 @@ export default function Login() {
                             onChange={(e) => setFormData({...formData, password: e.target.value})}
                             required
                         />
-                         {isLogin === true && ( // Only show forgot password for login
-                            <div className="text-right">
-                                <button 
-                                    type="button"
-                                    onClick={() => setIsLogin('recovery')}
-                                    className="text-xs text-brand-turquoise hover:underline"
-                                >
-                                    ¿Olvidaste tu contraseña?
-                                </button>
-                            </div>
-                        )}
                     </div>
+                    
+                    {isLogin === true && (
+                        <div className="text-right -mt-2">
+                             <button 
+                                 type="button"
+                                 onClick={() => setIsLogin('recovery')}
+                                 className="text-xs text-brand-turquoise hover:text-white transition-colors"
+                             >
+                                 ¿Olvidaste tu contraseña?
+                             </button>
+                         </div>
+                    )}
                     {isLogin === false && ( // Only show confirm password for registration
                         <div className="space-y-1">
-                            <label className="text-xs font-bold text-brand-text-secondary uppercase tracking-wider ml-1">Confirmar Contraseña</label>
+                            <label className="text-xs font-bold text-gray-300 uppercase tracking-wider ml-1">Confirmar Contraseña</label>
                             <input 
                                 type="password" 
                                 placeholder="••••••••" 
@@ -237,7 +240,7 @@ export default function Login() {
                             <div className="w-full border-t border-white/10"></div>
                         </div>
                         <div className="relative flex justify-center text-xs uppercase">
-                            <span className="bg-brand-dark px-2 text-brand-text-secondary">O continúa con</span>
+                            <span className="bg-brand-card px-2 text-gray-400">O continúa con</span>
                         </div>
                     </div>
 
@@ -268,10 +271,13 @@ export default function Login() {
             )}
         </div>
       </div>
-      <button onClick={() => window.location.href = 'https://www.growthbuddies.cl/'} className="mt-8 mx-auto text-center text-sm text-brand-text-secondary/60 hover:text-brand-turquoise transition-colors flex items-center justify-center gap-2">
+      
+      {/* Back Button */}
+      <button onClick={() => window.location.href = 'https://www.growthbuddies.cl/'} className="mt-6 text-sm text-gray-400 hover:text-white transition-colors flex items-center justify-center gap-2">
             <ArrowLeft size={14} />
             <span>Volver a Growth Buddies</span>
         </button>
+      </div>
     </div>
   );
 }

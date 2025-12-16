@@ -4,43 +4,54 @@ import { db } from '../firebase-config';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { X, Send, Loader2 } from 'lucide-react';
 
-export default function TicketForm({ isOpen, onClose, onSuccess }) {
-  const { currentUser, userCompanyId, userTier } = useAuth();
+export default function TicketForm({ isOpen, onClose, onSuccess, companyIdOverride }) {
+  const { currentUser, userCompanyId } = useAuth();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    category: 'question', // question, bug, feature
-    priority: 'medium', // low, medium, high (client perception)
+    category: 'question',
+    priority: 'medium',
   });
 
   if (!isOpen) return null;
+
+  // Use override if provided (from superuser filter), else user's own company
+  const effectiveCompanyId = companyIdOverride !== undefined ? companyIdOverride : userCompanyId;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      // Determine collection path based on user type (Company vs Personal)
-      const collectionPath = (userTier === 'premium' && userCompanyId)
-        ? `companies/${userCompanyId}/tasks`
+      // Determine collection path
+      const collectionPath = effectiveCompanyId
+        ? `companies/${effectiveCompanyId}/tasks`
         : `users/${currentUser.uid}/tasks`;
 
-      await addDoc(collection(db, collectionPath), {
+      const docRef = await addDoc(collection(db, collectionPath), {
         title: formData.title,
         description: formData.description,
         category: formData.category,
         priority: formData.priority,
-        columnId: 'todo', // Default column for new requests
+        columnId: 'todo',
         status: 'new',
         type: 'ticket',
         requestorId: currentUser.uid,
         requestorName: currentUser.displayName || currentUser.email,
         createdAt: serverTimestamp(),
-        // Default fields for internal tracking
         assignedTo: null,
         estimatedHours: 0,
-        companyId: userCompanyId || null
+        companyId: effectiveCompanyId || null
+      });
+
+      // Add initial 'created' activity log entry
+      await addDoc(collection(db, `${collectionPath}/${docRef.id}/activityLog`), {
+        type: 'created',
+        timestamp: serverTimestamp(),
+        userId: currentUser.uid,
+        userName: currentUser.displayName || currentUser.email,
+        details: {}
       });
 
       setFormData({ title: '', description: '', category: 'question', priority: 'medium' });
@@ -59,9 +70,9 @@ export default function TicketForm({ isOpen, onClose, onSuccess }) {
       <div className="bg-brand-card w-full max-w-lg rounded-xl border border-brand-border shadow-2xl overflow-hidden relative">
         
         {/* Header */}
-        <div className="flex justify-between items-center p-6 border-b border-brand-border bg-brand-dark/50">
+        <div className="flex justify-between items-center p-6 border-b border-brand-border bg-brand-dark">
           <h3 className="text-xl font-bold text-white">Nueva Solicitud</h3>
-          <button onClick={onClose} className="text-brand-text-secondary hover:text-white transition-colors">
+          <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors">
             <X size={24} />
           </button>
         </div>
@@ -75,7 +86,7 @@ export default function TicketForm({ isOpen, onClose, onSuccess }) {
               type="text" 
               required
               placeholder="Ej: Problema con el reporte de ventas..." 
-              className="w-full bg-brand-dark border border-brand-border rounded-lg py-2.5 px-4 focus:outline-none focus:ring-2 focus:ring-brand-turquoise transition text-sm text-white placeholder-gray-600"
+              className="w-full bg-[#050505] border border-gray-800 rounded-lg py-2.5 px-4 focus:outline-none focus:ring-1 focus:ring-brand-turquoise transition text-sm text-white placeholder-gray-500"
               value={formData.title}
               onChange={(e) => setFormData({...formData, title: e.target.value})}
             />
@@ -85,7 +96,7 @@ export default function TicketForm({ isOpen, onClose, onSuccess }) {
             <div>
               <label className="block text-sm font-medium text-brand-text-secondary mb-1">Tipo</label>
               <select 
-                className="w-full bg-brand-dark border border-brand-border rounded-lg py-2.5 px-4 focus:outline-none focus:ring-2 focus:ring-brand-turquoise transition text-sm text-white appearance-none"
+                className="w-full bg-[#050505] border border-gray-800 rounded-lg py-2.5 px-4 focus:outline-none focus:ring-1 focus:ring-brand-turquoise transition text-sm text-white appearance-none"
                 value={formData.category}
                 onChange={(e) => setFormData({...formData, category: e.target.value})}
               >
@@ -97,7 +108,7 @@ export default function TicketForm({ isOpen, onClose, onSuccess }) {
             <div>
               <label className="block text-sm font-medium text-brand-text-secondary mb-1">Prioridad (Tu visión)</label>
               <select 
-                className="w-full bg-brand-dark border border-brand-border rounded-lg py-2.5 px-4 focus:outline-none focus:ring-2 focus:ring-brand-turquoise transition text-sm text-white appearance-none"
+                className="w-full bg-[#050505] border border-gray-800 rounded-lg py-2.5 px-4 focus:outline-none focus:ring-1 focus:ring-brand-turquoise transition text-sm text-white appearance-none"
                 value={formData.priority}
                 onChange={(e) => setFormData({...formData, priority: e.target.value})}
               >
@@ -114,7 +125,7 @@ export default function TicketForm({ isOpen, onClose, onSuccess }) {
               required
               rows="4"
               placeholder="Describe lo que necesitas con el mayor detalle posible..."
-              className="w-full bg-brand-dark border border-brand-border rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-brand-turquoise transition text-sm text-white placeholder-gray-600 resize-none"
+              className="w-full bg-[#050505] border border-gray-800 rounded-lg py-3 px-4 focus:outline-none focus:ring-1 focus:ring-brand-turquoise transition text-sm text-white placeholder-gray-500 resize-none"
               value={formData.description}
               onChange={(e) => setFormData({...formData, description: e.target.value})}
             />

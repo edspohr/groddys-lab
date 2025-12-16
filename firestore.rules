@@ -39,6 +39,11 @@ service cloud.firestore {
       // TAREAS PERSONALES (Freemium Task Optimizer)
       match /tasks/{taskId} {
         allow read, write: if request.auth.uid == userId;
+        
+        // Activity Log subcollection
+        match /activityLog/{logId} {
+          allow read, write: if request.auth.uid == userId;
+        }
       }
     }
 
@@ -51,7 +56,23 @@ service cloud.firestore {
       match /tasks/{taskId} {
         allow read, create: if isAdminOfCompany(companyId) || isUserOfCompany(companyId);
         allow update, delete: if isAdminOfCompany(companyId) || (isUserOfCompany(companyId) && resource.data.createdBy == request.auth.uid);
+        
+        // Activity Log subcollection
+        match /activityLog/{logId} {
+          allow read, write: if isAdminOfCompany(companyId) || isUserOfCompany(companyId);
+        }
       }
+
+      // Meetings (Bitácora) subcollection
+      match /meetings/{meetingId} {
+        allow read: if isSuperuser() || isAdminOfCompany(companyId) || isUserOfCompany(companyId);
+        allow create, update, delete: if isSuperuser() || isAdminOfCompany(companyId);
+      }
+    }
+
+    // --- TOP-LEVEL MEETINGS (for Superuser aggregate view) ---
+    match /meetings/{meetingId} {
+      allow read, write: if isSuperuser();
     }
 
     // --- CURSOS Y LECCIONES (Academy) ---

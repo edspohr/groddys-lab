@@ -47,6 +47,7 @@ export function AuthProvider({ children }) {
         await createUserProfile(result.user, { displayName: name });
         return result;
       });
+  }
 
 
   function resetPassword(email) {

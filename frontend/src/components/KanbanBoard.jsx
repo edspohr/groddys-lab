@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { db } from '../firebase-config';
-import { collection, query, onSnapshot, doc, updateDoc, orderBy } from 'firebase/firestore';
-import { PlusCircle, Loader } from 'lucide-react';
+import { collection, query, onSnapshot, doc, updateDoc, collectionGroup, addDoc, serverTimestamp } from 'firebase/firestore';
+import { PlusCircle, Loader } from 'lucide-react'
 
 const COLUMNS = [
   { id: 'todo', title: 'To Do' },
@@ -17,19 +17,36 @@ const PriorityColors = {
   low: "border-l-4 border-l-blue-500",
 };
 
-export default function KanbanBoard({ onTaskClick }) {
-  const { currentUser, userTier, userCompanyId } = useAuth();
+const CategoryBadges = {
+  bug: { label: 'Bug', classes: 'bg-red-500/10 text-red-400' },
+  feature: { label: 'Feature', classes: 'bg-purple-500/10 text-purple-400' },
+  question: { label: 'Consulta', classes: 'bg-blue-500/10 text-blue-400' },
+  default: { label: 'Tarea', classes: 'bg-gray-500/10 text-gray-400' }
+};
+
+export default function KanbanBoard({ onTaskClick, companyIdFilter }) {
+  const { currentUser, userRole, userCompanyId } = useAuth();
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [draggedTaskId, setDraggedTaskId] = useState(null);
+
+  const isSuperuser = userRole === 'Superuser' || userRole === 'Admin';
+  // Effective company: use prop if given, else fall back to user's company
+  const effectiveCompanyId = companyIdFilter !== undefined ? companyIdFilter : userCompanyId;
 
   useEffect(() => {
     if (!currentUser) return;
 
     let q;
-    if (userTier === 'premium' && userCompanyId) {
-      q = query(collection(db, "companies", userCompanyId, "tasks"));
+    
+    if (isSuperuser && !effectiveCompanyId) {
+      // Superuser viewing ALL companies
+      q = collectionGroup(db, "tasks");
+    } else if (effectiveCompanyId) {
+      // Specific company
+      q = query(collection(db, "companies", effectiveCompanyId, "tasks"));
     } else {
+      // Freemium user
       q = query(collection(db, "users", currentUser.uid, "tasks"));
     }
 
@@ -43,7 +60,7 @@ export default function KanbanBoard({ onTaskClick }) {
     });
 
     return () => unsubscribe();
-  }, [currentUser, userTier, userCompanyId]);
+  }, [currentUser, effectiveCompanyId, isSuperuser]);
 
   const handleDragStart = (e, taskId) => {
     setDraggedTaskId(taskId);
@@ -59,16 +76,27 @@ export default function KanbanBoard({ onTaskClick }) {
   const handleDrop = async (e, columnId) => {
     e.preventDefault();
     const taskId = e.dataTransfer.getData('text/plain');
+    const task = tasks.find(t => t.id === taskId);
+    const previousColumnId = task?.columnId;
     
-    if (taskId) {
-        // Optimistic UI update could go here
-        
+    if (taskId && previousColumnId !== columnId) {
         try {
-            const taskRef = userTier === 'premium' && userCompanyId 
-                ? doc(db, "companies", userCompanyId, "tasks", taskId)
-                : doc(db, "users", currentUser.uid, "tasks", taskId);
-            
+            // Determine collection path using effectiveCompanyId
+            const collectionPath = effectiveCompanyId
+                ? `companies/${effectiveCompanyId}/tasks`
+                : `users/${currentUser.uid}/tasks`;
+
+            const taskRef = doc(db, collectionPath, taskId);
             await updateDoc(taskRef, { columnId: columnId });
+
+            // Add status_change activity log entry
+            await addDoc(collection(db, `${collectionPath}/${taskId}/activityLog`), {
+                type: 'status_change',
+                timestamp: serverTimestamp(),
+                userId: currentUser.uid,
+                userName: currentUser.displayName || currentUser.email,
+                details: { from: previousColumnId, to: columnId }
+            });
         } catch (error) {
             console.error("Error moving task:", error);
         }
@@ -99,18 +127,26 @@ export default function KanbanBoard({ onTaskClick }) {
           <div className="space-y-4 min-h-[200px] border border-dashed border-gray-800 rounded-lg p-2 transition-colors hover:border-brand-border">
             {tasks
                 .filter(task => task.columnId === column.id)
-                .sort((a,b) => (a.priority === 'high' ? -1 : 1)) // Simple sort example
+                .sort((a, b) => {
+                    const weight = { high: 3, medium: 2, low: 1 };
+                    return (weight[b.priority] || 0) - (weight[a.priority] || 0);
+                })
                 .map(task => (
                     <div
                         key={task.id}
                         draggable
                         onDragStart={(e) => handleDragStart(e, task.id)}
                         onClick={() => onTaskClick && onTaskClick(task)}
-                        className={`k-card bg-brand-card p-3 rounded-lg border border-brand-border ${PriorityColors[task.priority] || ""} group`}
+                        className={`k-card bg-brand-card p-3 rounded-lg border border-brand-border ${PriorityColors[task.priority] || ""} group ${draggedTaskId === task.id ? 'opacity-50' : ''}`}
                     >
                         <div className="flex justify-between items-start mb-1">
                             <h4 className="font-medium text-white text-sm">{task.title}</h4>
-                            {task.priority === 'high' && <span className="bg-red-900/50 text-red-200 text-[10px] px-1.5 py-0.5 rounded">Alta</span>}
+                            <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium border border-white/5 ${CategoryBadges[task.category]?.classes || CategoryBadges.default.classes}`}>
+                                {CategoryBadges[task.category]?.label || task.category || 'Tarea'}
+                            </span>
+                        </div>
+                        <div className="flex gap-2 mb-2">
+                             {task.priority === 'high' && <span className="bg-red-900/30 text-red-200 text-[10px] px-1.5 py-0.5 rounded">Prioridad Alta</span>}
                         </div>
                         <p className="text-xs text-brand-text-secondary line-clamp-2">{task.description}</p>
                         

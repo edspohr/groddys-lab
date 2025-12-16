@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { db } from '../firebase-config';
-import { collection, onSnapshot, addDoc, query, orderBy, serverTimestamp, where } from 'firebase/firestore';
+import { collection, onSnapshot, addDoc, query, orderBy, serverTimestamp } from 'firebase/firestore';
 import { useAuth } from '../contexts/AuthContext';
 import { FileText, Plus, Calendar, Users, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -29,8 +29,10 @@ export default function Meetings() {
     const targetCompanyId = isSuperuser ? selectedCompanyId : userCompanyId;
 
     if (!targetCompanyId && isSuperuser) {
-        setMeetings([]); 
-        setLoading(false);
+        setTimeout(() => {
+            if (meetings.length > 0) setMeetings([]); 
+            if (loading) setLoading(false);
+        }, 0);
         return;
     }
 
@@ -49,6 +51,7 @@ export default function Meetings() {
         });
         return () => unsubscribe();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCompanyId, userCompanyId, isSuperuser]);
 
   return (
