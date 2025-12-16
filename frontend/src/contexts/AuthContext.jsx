@@ -5,8 +5,10 @@ import {
   signInWithPopup, 
   GoogleAuthProvider, 
   signOut,
+
   createUserWithEmailAndPassword,
-  updateProfile
+  updateProfile,
+  sendPasswordResetEmail
 } from "firebase/auth";
 import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { auth, db } from "../firebase-config";
@@ -45,6 +47,10 @@ export function AuthProvider({ children }) {
         await createUserProfile(result.user, { displayName: name });
         return result;
       });
+
+
+  function resetPassword(email) {
+    return sendPasswordResetEmail(auth, email);
   }
 
   // Helper to create/update Firestore profile
@@ -125,6 +131,7 @@ export function AuthProvider({ children }) {
     loginWithGoogle,
     logout,
     register,
+    resetPassword,
     loading
   };
 

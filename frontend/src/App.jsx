@@ -7,6 +7,8 @@ import AdminDashboard from './pages/Admin/AdminDashboard';
 import CompanyList from './pages/Admin/CompanyList';
 import UserList from './pages/Admin/UserList';
 import Meetings from './pages/Meetings';
+import Academy from './pages/Academy';
+import Profile from './pages/Profile';
 
 function ProtectedRoute({ children }) {
   const { currentUser, loading } = useAuth();
@@ -68,12 +70,11 @@ export default function App() {
               </MainLayout>
             </ProtectedRoute>
           } />
-          
           {/* Changed /academy to a direct element */}
           <Route path="/academy" element={
             <ProtectedRoute>
               <MainLayout>
-                <div className="text-white p-4">Academy Module (Coming Soon)</div>
+                <Academy />
               </MainLayout>
             </ProtectedRoute>
           } />
@@ -82,7 +83,7 @@ export default function App() {
           <Route path="/profile" element={
             <ProtectedRoute>
               <MainLayout>
-                <div className="text-white p-4">Profile Module (Coming Soon)</div>
+                <Profile />
               </MainLayout>
             </ProtectedRoute>
           } />

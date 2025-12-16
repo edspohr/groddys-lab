@@ -7,7 +7,8 @@ import TicketForm from '../components/TicketForm';
 import TaskDetailModal from '../components/TaskDetailModal';
 import DashboardMetrics from '../components/DashboardMetrics';
 import ProfileModal from '../components/ProfileModal';
-import { Layers, CheckCircle, Zap, Plus, User } from 'lucide-react';
+import { Layers, CheckCircle, Zap, Plus, User, FileText } from 'lucide-react';
+import { generateMonthlyReport } from '../utils/generateMonthlyReport';
 
 export default function Dashboard() {
   const { currentUser, userTier, userCompanyId } = useAuth();
@@ -65,11 +66,19 @@ export default function Dashboard() {
             </div>
             <div className="flex gap-3">
                 <button 
+                    onClick={() => generateMonthlyReport(tasks, metrics, "Mi Empresa", currentUser)}
+                    className="glass-card px-4 py-2 rounded-lg font-semibold text-white hover:bg-white/5 transition flex items-center gap-2"
+                    title="Descargar Reporte Mensual (PDF)"
+                >
+                    <FileText size={20} className="text-blue-400" />
+                    <span className="hidden lg:inline">Reporte</span>
+                </button>
+                <button 
                     onClick={() => setIsProfileOpen(true)}
                     className="glass-card px-4 py-2 rounded-lg font-semibold text-white hover:bg-white/5 transition flex items-center gap-2"
                 >
                     <User size={20} className="text-brand-purple" />
-                    <span className="hidden sm:inline">Mi Perfil</span>
+                    <span className="hidden sm:inline">Perfil</span>
                 </button>
                 <button 
                     onClick={() => setIsTicketFormOpen(true)}
