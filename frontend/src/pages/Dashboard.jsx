@@ -5,18 +5,22 @@ import { collection, query, onSnapshot } from 'firebase/firestore';
 import KanbanBoard from '../components/KanbanBoard';
 import TicketForm from '../components/TicketForm';
 import TaskDetailModal from '../components/TaskDetailModal';
-import { Layers, CheckCircle, Zap, Activity, Plus } from 'lucide-react';
+import DashboardMetrics from '../components/DashboardMetrics';
+import ProfileModal from '../components/ProfileModal';
+import { Layers, CheckCircle, Zap, Plus, User } from 'lucide-react';
 
 export default function Dashboard() {
   const { currentUser, userTier, userCompanyId } = useAuth();
   const [isTicketFormOpen, setIsTicketFormOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
+  const [tasks, setTasks] = useState([]); // Raw tasks for charts
   const [metrics, setMetrics] = useState({
     active: 0,
     completed: 0,
-    saved: 0,
-    efficiency: 0
+    saved: 0
   });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!currentUser) return;
@@ -29,25 +33,20 @@ export default function Dashboard() {
     }
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const tasks = snapshot.docs.map(doc => doc.data());
+      const fetchedTasks = snapshot.docs.map(doc => doc.data());
       
-      const active = tasks.filter(t => ['todo', 'inprogress', 'review'].includes(t.columnId)).length;
-      const completed = tasks.filter(t => t.columnId === 'done').length;
+      const active = fetchedTasks.filter(t => ['todo', 'inprogress', 'review'].includes(t.columnId)).length;
+      const completed = fetchedTasks.filter(t => t.columnId === 'done').length;
       
-      const completedTasks = tasks.filter(t => t.columnId === 'done');
+      const completedTasks = fetchedTasks.filter(t => t.columnId === 'done');
       const saved = completedTasks.reduce((acc, t) => acc + (parseFloat(t.savingsHours) || 0), 0);
       
-      let totalReal = 0;
-      let savingsEff = 0;
-      completedTasks.forEach(t => {
-          if (parseFloat(t.actualHours) > 0) {
-              totalReal += parseFloat(t.actualHours);
-              savingsEff += parseFloat(t.savingsHours) || 0;
-          }
-      });
-      const efficiency = totalReal > 0 ? (savingsEff / totalReal).toFixed(1) : (savingsEff > 0 ? savingsEff : 0);
-
-      setMetrics({ active, completed, saved: saved.toFixed(1), efficiency });
+      setMetrics({ active, completed, saved: saved.toFixed(1) });
+      setTasks(fetchedTasks);
+      setLoading(false);
+    }, (error) => {
+        console.error("Error fetching tasks:", error);
+        setLoading(false);
     });
 
     return () => unsubscribe();
@@ -64,17 +63,27 @@ export default function Dashboard() {
                 Métricas clave y gestión del flujo de trabajo.
                 </p>
             </div>
-            <button 
-                onClick={() => setIsTicketFormOpen(true)}
-                className="bg-brand-turquoise text-brand-dark px-4 py-2 rounded-lg font-bold flex items-center gap-2 hover:opacity-90 transition-transform active:scale-95 shadow-lg shadow-brand-turquoise/20"
-            >
-                <Plus size={20} />
-                Nueva Solicitud
-            </button>
+            <div className="flex gap-3">
+                <button 
+                    onClick={() => setIsProfileOpen(true)}
+                    className="glass-card px-4 py-2 rounded-lg font-semibold text-white hover:bg-white/5 transition flex items-center gap-2"
+                >
+                    <User size={20} className="text-brand-purple" />
+                    <span className="hidden sm:inline">Mi Perfil</span>
+                </button>
+                <button 
+                    onClick={() => setIsTicketFormOpen(true)}
+                    className="bg-brand-turquoise text-brand-dark px-4 py-2 rounded-lg font-bold flex items-center gap-2 hover:opacity-90 transition-transform active:scale-95 shadow-lg shadow-brand-turquoise/20"
+                >
+                    <Plus size={20} />
+                    <span className="hidden sm:inline">Nueva Solicitud</span>
+                    <span className="sm:hidden">Nueva</span>
+                </button>
+            </div>
         </header>
 
-        {/* Metrics Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {/* Top KPI Cards (Immediate Stats) */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <MetricCard 
                 icon={<Layers size={32} className="text-brand-turquoise" />}
                 title="Tareas Activas"
@@ -96,25 +105,21 @@ export default function Dashboard() {
                 sub="Impacto Directo"
                 color="yellow-500"
             />
-             <MetricCard 
-                icon={<Activity size={32} className="text-purple-500" />}
-                title="Eficiencia"
-                value={`${metrics.efficiency}x`}
-                sub="Ahorro vs Real"
-                color="purple-500"
-            />
         </div>
 
+        {/* Detailed Metrics Charts (Hours & Strategy) */}
+        {!loading && <DashboardMetrics tasks={tasks} />}
+
         {/* Kanban Board */}
-        <KanbanBoard onTaskClick={setSelectedTask} />
+        <div className="animate-fade-in">
+             <KanbanBoard onTaskClick={setSelectedTask} />
+        </div>
 
         {/* Global Modals */}
         <TicketForm 
             isOpen={isTicketFormOpen} 
             onClose={() => setIsTicketFormOpen(false)} 
-            onSuccess={() => {
-                // Optional: Show toast notification?
-            }}
+            onSuccess={() => {}}
         />
         
         <TaskDetailModal 
@@ -122,23 +127,32 @@ export default function Dashboard() {
             task={selectedTask}
             onClose={() => setSelectedTask(null)}
         />
+        
+        <ProfileModal 
+            isOpen={isProfileOpen}
+            onClose={() => setIsProfileOpen(false)}
+        />
     </div>
   )
 }
 
 function MetricCard({ icon, title, value, sub, color }) {
     return (
-        <div className={`bg-linear-to-r from-brand-dark to-brand-card rounded-2xl p-6 md:p-10 mb-10 border border-brand-border relative overflow-hidden group hover:border-${color} transition duration-300`}>
-            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition">
+        <div className={`glass-card rounded-2xl p-6 md:p-10 mb-10 relative overflow-hidden group border-white/5`}>
+            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                 {icon}
             </div>
-            <h4 className="font-semibold text-brand-text-secondary text-sm uppercase tracking-wider">
+            <h4 className="font-semibold text-brand-text-secondary text-sm uppercase tracking-wider mb-2">
                 {title}
             </h4>
-            <p className="text-3xl font-bold mt-2 text-white">
-                {value}
-            </p>
-            <p className="text-xs text-gray-500 mt-1">{sub}</p>
+            <div className="flex items-baseline gap-2">
+                <p className={`text-3xl font-bold bg-clip-text text-transparent bg-linear-to-r from-white to-white/70`}>
+                    {value}
+                </p>
+                {/* Optional colored indicator dot */}
+                <div className={`w-2 h-2 rounded-full bg-${color} shadow-[0_0_8px_currentColor] text-${color}`}></div>
+            </div>
+            <p className="text-xs text-gray-500 mt-2 font-medium">{sub}</p>
         </div>
     );
 }

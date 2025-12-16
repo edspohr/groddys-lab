@@ -121,11 +121,11 @@ export default function TaskDetailModal({ task, isOpen, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
-      <div className="bg-brand-card w-full max-w-4xl rounded-xl border border-brand-border shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fade-in">
+      <div className="glass-card w-full max-w-4xl rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] border-white/10">
         
         {/* Header */}
-        <div className="flex justify-between items-start p-6 border-b border-brand-border bg-brand-dark/50 shrink-0">
+        <div className="flex justify-between items-start p-6 border-b border-white/10 bg-black/40 shrink-0">
            {isAdmin && isEditing ? (
                <input 
                  className="bg-transparent border-b border-brand-border text-xl font-bold text-white focus:outline-none w-full mr-4"
